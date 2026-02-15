@@ -1692,16 +1692,19 @@ img {
         background-position: 30% top;
     }
 
-    .hero-title {
-        font-size: 2rem;
+    .hero-content {
+        padding-top: 80px;
     }
 
-    .hero-subtitle {
-        font-size: 0.95rem;
+    .hero-title {
+        font-size: 0.7rem;
+        letter-spacing: 2px;
     }
 
     .hero-scroll-indicator {
-        bottom: 20px;
+        position: static;
+        transform: none;
+        margin-top: 40px;
     }
 
     /* ─── About ─── */
