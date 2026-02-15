@@ -1687,24 +1687,38 @@ img {
         font-size: 1.4rem;
     }
 
-    /* ─── Hero: shift image left so person is visible ─── */
+    /* ─── Hero: fix layout for mobile ─── */
     .hero-bg {
         background-position: 30% top;
     }
 
+    .hero {
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding-top: 100px;
+        padding-bottom: 30px;
+        min-height: 100vh;
+    }
+
     .hero-content {
-        padding-top: 80px;
+        flex-shrink: 0;
     }
 
     .hero-title {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         letter-spacing: 2px;
+    }
+
+    .name-line {
+        font-size: clamp(2.5rem, 12vw, 4rem);
     }
 
     .hero-scroll-indicator {
         position: static;
         transform: none;
-        margin-top: 40px;
+        margin-top: auto;
+        padding-top: 30px;
     }
 
     /* ─── About ─── */
