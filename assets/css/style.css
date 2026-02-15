@@ -1889,11 +1889,12 @@ img {
 
     /* Hero smallest */
     .hero-title {
-        font-size: 1.6rem;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
     }
 
-    .hero-subtitle {
-        font-size: 0.85rem;
+    .name-line {
+        font-size: clamp(2rem, 14vw, 3rem);
     }
 
     .section-number {
