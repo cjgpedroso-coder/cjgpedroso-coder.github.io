@@ -295,27 +295,59 @@ function initThemeToggle() {
 }
 
 /* ═══════════════════════════════════════
-   PROJECT CARDS — Expand / Collapse
+   PROJECT CARDS — Modal
    ═══════════════════════════════════════ */
 function initProjectCards() {
     const cards = document.querySelectorAll('.project-card');
-    if (!cards.length) return;
+    const modal = document.getElementById('projectModal');
+    if (!cards.length || !modal) return;
+
+    const modalImg = document.getElementById('projectModalImg');
+    const modalTags = document.getElementById('projectModalTags');
+    const modalTitle = document.getElementById('projectModalTitle');
+    const modalDesc = document.getElementById('projectModalDesc');
+    const closeBtn = modal.querySelector('.project-modal-close');
+    const overlay = modal.querySelector('.project-modal-overlay');
 
     cards.forEach(card => {
         card.addEventListener('click', () => {
-            const isExpanded = card.classList.contains('expanded');
+            // Get data from the card
+            const img = card.querySelector('.project-image img');
+            const tags = card.querySelectorAll('.project-tags .tag');
+            const title = card.querySelector('.project-title');
+            const desc = card.querySelector('.project-desc');
 
-            // Collapse all cards first
-            cards.forEach(c => c.classList.remove('expanded'));
+            // Populate modal
+            modalImg.src = img.src;
+            modalImg.alt = img.alt;
+            modalTitle.textContent = title.textContent;
+            modalDesc.textContent = desc.textContent;
 
-            // Toggle clicked card
-            if (!isExpanded) {
-                card.classList.add('expanded');
-                // Smooth scroll to the card
-                setTimeout(() => {
-                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 300);
-            }
+            // Clone tags
+            modalTags.innerHTML = '';
+            tags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.textContent = tag.textContent;
+                modalTags.appendChild(span);
+            });
+
+            // Show modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
         });
+    });
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
     });
 }
