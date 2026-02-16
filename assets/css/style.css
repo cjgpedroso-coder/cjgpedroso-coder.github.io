@@ -1706,7 +1706,7 @@ img {
     }
 
     .hero-title {
-        font-size: 0.6rem;
+        font-size: 0.85rem;
         letter-spacing: 1px;
         text-transform: none;
     }
@@ -1890,7 +1890,7 @@ img {
 
     /* Hero smallest */
     .hero-title {
-        font-size: 0.56rem;
+        font-size: 0.8rem;
         letter-spacing: 1px;
         text-transform: none;
     }
