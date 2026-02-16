@@ -23,10 +23,19 @@
 
         // Fun mode — start the experience
         btnFun.addEventListener('click', () => {
+            // Show fake offline screen INSTANTLY behind the overlay
+            const dinoScreen = document.getElementById('funDinoScreen');
+            document.body.style.overflow = 'hidden';
+            dinoScreen.classList.add('active');
+
+            // Then fade out the entry overlay
             entryOverlay.classList.add('hidden');
             setTimeout(() => {
                 entryOverlay.remove();
-                startFunSequence();
+                // After 4 seconds from now, show the "gotcha" modal
+                setTimeout(() => {
+                    showSequenceModal(0);
+                }, 4000);
             }, 500);
         });
     }
