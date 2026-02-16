@@ -1690,6 +1690,7 @@ img {
     /* ─── Hero: fix layout for mobile ─── */
     .hero-bg {
         background-position: 30% top;
+        background-image: url('../img/img3.jpg') !important;
     }
 
     .hero {
