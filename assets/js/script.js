@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileNav();
     initActiveNavLink();
     initProjectCards();
+    initMobileContactFab();
 });
 
 /* ═══════════════════════════════════════
@@ -348,6 +349,59 @@ function initProjectCards() {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modal.classList.contains('active')) {
             closeModal();
+        }
+    });
+}
+
+/* ═══════════════════════════════════════
+   MOBILE FLOATING CONTACT FAB
+   ═══════════════════════════════════════ */
+function initMobileContactFab() {
+    const fab = document.getElementById('mobileContactFab');
+    if (!fab) return;
+
+    const sobreSection = document.getElementById('sobre');
+    if (!sobreSection) return;
+
+    let autoExpanded = false;
+
+    // Show/hide based on scroll position (visible from "Sobre mim" onward)
+    window.addEventListener('scroll', () => {
+        const sobreTop = sobreSection.offsetTop - 200;
+        const scrollY = window.pageYOffset;
+
+        if (scrollY > sobreTop) {
+            fab.classList.add('visible');
+        } else {
+            fab.classList.remove('visible');
+            fab.classList.remove('expanded');
+        }
+
+        // Auto-expand at bottom of page
+        const nearBottom = (window.innerHeight + scrollY) >= (document.body.scrollHeight - 100);
+        if (nearBottom && !autoExpanded) {
+            autoExpanded = true;
+            fab.classList.add('expanded');
+        }
+    });
+
+    // Toggle on click (on the photo bubble)
+    fab.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fab.classList.toggle('expanded');
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!fab.contains(e.target)) {
+            fab.classList.remove('expanded');
+        }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            fab.classList.remove('expanded');
         }
     });
 }
