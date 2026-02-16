@@ -438,7 +438,7 @@
         overlay.appendChild(hater);
 
         // Auto-disappear — time decreases with each hit (2s → min 0.5s)
-        const haterTimes = [2000, 1600, 1200, 800, 500];
+        const haterTimes = [2000, 1600, 1200, 800, 700];
         const visibleTime = haterTimes[Math.min(haterHits, haterTimes.length - 1)];
         haterTimer = setTimeout(() => {
             if (!haterGameRunning) return;
