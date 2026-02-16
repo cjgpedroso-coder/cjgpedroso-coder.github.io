@@ -13,10 +13,57 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css?v=2">
+    <link rel="stylesheet" href="assets/css/fun-mode.css?v=1">
 </head>
 
 <body>
 
+    <!-- ═══════════════════ FUN MODE — Entry Modal ═══════════════════ -->
+    <div class="fun-entry-overlay" id="funEntryOverlay">
+        <div class="fun-entry-modal">
+            <div class="fun-entry-emoji"></div>
+            <h2 class="fun-entry-title">Como deseja visualizar?</h2>
+            <p class="fun-entry-desc">Escolha entre o currículo tradicional ou uma experiência um pouco mais...
+                criativa.</p>
+            <div class="fun-entry-buttons">
+                <button class="fun-btn fun-btn-common" id="funBtnCommon">📄 Comum</button>
+                <button class="fun-btn fun-btn-fun" id="funBtnFun">🎮 Criativo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ FUN MODE — Fake Offline + Dino Game ═══════════════════ -->
+    <div class="fun-dino-screen" id="funDinoScreen">
+        <div class="fun-offline-message">
+            <div class="fun-offline-icon">⚠️</div>
+            <h3 class="fun-offline-title">Sem conexão com a Internet</h3>
+            <p class="fun-offline-desc">Tente verificar os cabos de rede ou o roteador.</p>
+        </div>
+        <div class="fun-dino-canvas-wrapper">
+            <canvas id="funDinoCanvas"></canvas>
+        </div>
+        <p class="fun-dino-instructions">Pressione ESPAÇO ou clique para começar</p>
+    </div>
+
+    <!-- ═══════════════════ FUN MODE — Sequence Modals ═══════════════════ -->
+    <div class="fun-modal-overlay" id="funModalOverlay">
+        <div class="fun-modal-box">
+            <div class="fun-modal-emoji" id="funModalEmoji">😂</div>
+            <p class="fun-modal-text" id="funModalText"></p>
+            <div class="fun-modal-actions">
+                <button class="fun-modal-dodge" id="funDodgeBtn" style="display:none">📄 Comum</button>
+                <button class="fun-modal-next" id="funNextBtn">Próximo →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ FUN MODE — Reveal Banner ═══════════════════ -->
+    <div class="fun-reveal-banner" id="funRevealBanner">
+        <p class="fun-reveal-text">🎮 Avance no jogo para desbloquear o currículo!</p>
+        <div class="fun-reveal-bar">
+            <div class="fun-reveal-fill" id="funRevealFill"></div>
+        </div>
+    </div>
     <!-- ═══════════════════ NAVIGATION ═══════════════════ -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
@@ -793,6 +840,7 @@
     </div>
 
     <script src="assets/js/script.js?v=2"></script>
+    <script src="assets/js/fun-mode.js?v=1"></script>
 </body>
 
 </html>
