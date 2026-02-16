@@ -109,14 +109,15 @@
     position: fixed;
     inset: 0;
     z-index: 9998;
-    background: #f7f7f7;
+    background: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease;
+    overflow-y: auto;
 }
 
 .fun-dino-screen.active {
@@ -124,28 +125,82 @@
     pointer-events: all;
 }
 
-.fun-offline-message {
-    text-align: center;
+/* Chrome Offline Page Replica */
+.fun-chrome-offline {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 60px 40px 40px;
+}
+
+.fun-chrome-offline-content {
+    margin-bottom: 30px;
+}
+
+.fun-chrome-dino-icon {
     margin-bottom: 20px;
-    font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-.fun-offline-icon {
-    font-size: 2.5rem;
-    color: #5a5a5a;
-    margin-bottom: 16px;
+.fun-chrome-dino-img {
+    width: 120px;
+    height: auto;
+    image-rendering: pixelated;
 }
 
-.fun-offline-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #3c3c3c;
-    margin-bottom: 8px;
+.fun-chrome-title {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 2.2em;
+    font-weight: 500;
+    color: #333;
+    margin: 0 0 16px 0;
 }
 
-.fun-offline-desc {
-    font-size: 0.9rem;
-    color: #8a8a8a;
+.fun-chrome-suggestions {
+    margin-bottom: 20px;
+}
+
+.fun-chrome-try {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 1.3em;
+    color: #646464;
+    margin: 0 0 10px 0;
+}
+
+.fun-chrome-list {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 1.3em;
+    color: #646464;
+    margin: 0;
+    padding-left: 28px;
+    list-style-type: disc;
+    line-height: 2;
+}
+
+.fun-chrome-list li {
+    margin-bottom: 2px;
+}
+
+.fun-chrome-link {
+    color: #4285f4;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.fun-chrome-link:hover {
+    text-decoration: underline;
+}
+
+.fun-chrome-error-code {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 1.05em;
+    color: #969696;
+    margin: 20px 0 0 0;
+}
+
+.fun-chrome-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 0 0 20px 0;
 }
 
 .fun-dino-canvas-wrapper {
@@ -507,6 +562,111 @@
     }
 }
 
+/* ─── Footer Replay Buttons ─── */
+.fun-footer-games {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.fun-footer-prompt {
+    font-size: 0.85rem;
+    color: #8892b0;
+    margin-bottom: 12px;
+    font-family: 'Inter', sans-serif;
+}
+
+.fun-footer-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.fun-footer-btn {
+    padding: 10px 28px;
+    border-radius: 8px;
+    background: transparent;
+    color: #64ffda;
+    border: 1px solid #64ffda;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.fun-footer-btn:hover {
+    background: #64ffda;
+    color: #0a192f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+}
+
+/* ─── Auto-Help Gun ─── */
+.fun-autohelp-gun {
+    position: fixed;
+    bottom: -1000px;
+    right: -100px;
+    width: 1000px;
+    height: auto;
+    z-index: 10600;
+    transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease;
+    transform: rotate(-15deg);
+    filter: drop-shadow(0 0 20px rgba(255, 200, 0, 0.6));
+}
+
+.fun-autohelp-gun.visible {
+    bottom: -100px;
+}
+
+.fun-gunshot-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 10650;
+    background: rgba(255, 255, 255, 0.8);
+    animation: gunshotFlash 0.3s ease forwards;
+    pointer-events: none;
+}
+
+.fun-shockwave {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 100, 0, 0.8);
+    transform: translate(-50%, -50%);
+    animation: shockwaveExpand 1s ease-out forwards;
+    z-index: 10660;
+    pointer-events: none;
+}
+
+@keyframes shockwaveExpand {
+    0% {
+        width: 10px;
+        height: 10px;
+        opacity: 1;
+        border-width: 4px;
+    }
+
+    100% {
+        width: 200vw;
+        height: 200vw;
+        opacity: 0;
+        border-width: 40px;
+    }
+}
+
+@keyframes gunshotFlash {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
 /* ─── Hide on mobile ─── */
 @media (max-width: 768px) {
 
@@ -516,6 +676,7 @@
     .fun-reveal-banner,
     .fun-resume-reveal,
     .fun-hater-overlay,
+    .fun-autohelp-gun,
     #funBangOverlay {
         display: none !important;
     }

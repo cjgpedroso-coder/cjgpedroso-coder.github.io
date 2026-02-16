@@ -72,7 +72,7 @@
         },
         {
             emoji: '',
-            text: 'HAHA aposto que quem não apertou antes, tentou agora! Prometo que vou liberar esse botão em breve, mas vamos continuar.',
+            text: 'HAHA aposto que quem não apertou antes, tentou agora! Não, vamos até o final agora, lamento.',
             showDodge: false
         }
     ];
@@ -235,7 +235,7 @@
 
     function onDinoScore(score) {
         const fill = document.getElementById('funRevealFill');
-        const targetScore = 800;
+        const targetScore = 350;
         const pct = Math.min(100, (score / targetScore) * 100);
         fill.style.width = pct + '%';
 
@@ -353,16 +353,19 @@
         }, 1200);
     }
 
-    /* ─── Hater Shooting Game ─── */
     let haterHits = 0;
     let haterMisses = 0;
     let haterGameRunning = false;
     let haterTimer = null;
+    let haterDeaths = 0;
+    let autoHelpMode = false;
+    let autoHelpTriggered = false;
 
     function startHaterGame() {
         haterHits = 0;
         haterMisses = 0;
         haterGameRunning = true;
+        autoHelpTriggered = false;
         document.body.style.overflow = 'hidden';
 
         // Create game overlay
@@ -379,7 +382,6 @@
             `;
             document.body.appendChild(gameOverlay);
 
-            // Clicking the background = miss
             gameOverlay.addEventListener('click', (e) => {
                 if (e.target === gameOverlay || e.target.classList.contains('fun-hater-hud')) {
                     // Don't count clicks on HUD as misses
@@ -437,14 +439,22 @@
 
         overlay.appendChild(hater);
 
-        // Auto-disappear — time decreases with each hit (2s → min 0.5s)
-        const haterTimes = [2000, 1600, 1200, 800, 700];
+        // Auto-disappear — time decreases with each hit
+        const haterTimes = [2000, 1600, 1200, 800, 300];
         const visibleTime = haterTimes[Math.min(haterHits, haterTimes.length - 1)];
         haterTimer = setTimeout(() => {
             if (!haterGameRunning) return;
             hater.classList.add('missed');
             haterMisses++;
             updateHaterHUD();
+
+            // In auto-help mode, trigger the gun when down to 1 life
+            if (autoHelpMode && haterMisses >= 2 && !autoHelpTriggered) {
+                autoHelpTriggered = true;
+                clearTimeout(haterTimer);
+                setTimeout(() => triggerBangBangHelp(), 500);
+                return;
+            }
 
             if (haterMisses >= 3) {
                 haterGameRunning = false;
@@ -467,10 +477,88 @@
         const overlay = document.getElementById('funHaterGameOverlay');
         overlay.querySelectorAll('.fun-hater-target').forEach(h => h.remove());
         overlay.classList.remove('active');
+        haterDeaths++;
 
-        showFunModal('Você morreu! Tente novamente. 💀', () => {
-            startHaterGame();
+        if (haterDeaths >= 1) {
+            showFunModal('Aqui, deixa eu te ajudar 😎', () => {
+                autoHelpMode = true;
+                startHaterGame();
+            });
+        } else {
+            showFunModal('Você morreu! Tente novamente. 💀', () => {
+                startHaterGame();
+            });
+        }
+    }
+
+    /* ─── Auto-Help: BangBang gun explosion ─── */
+    function triggerBangBangHelp() {
+        haterGameRunning = false;
+        clearTimeout(haterTimer);
+
+        const overlay = document.getElementById('funHaterGameOverlay');
+
+        // Remove any existing haters
+        overlay.querySelectorAll('.fun-hater-target').forEach(h => h.remove());
+
+        // Create gun in bottom-right
+        const gun = document.createElement('img');
+        gun.src = 'assets/img/bangbang.png';
+        gun.className = 'fun-autohelp-gun';
+        document.body.appendChild(gun);
+
+        // Animate gun sliding up
+        requestAnimationFrame(() => {
+            gun.classList.add('visible');
         });
+
+        // After gun appears, FIRE!
+        setTimeout(() => {
+            // Gunshot flash
+            const flash = document.createElement('div');
+            flash.className = 'fun-gunshot-flash';
+            document.body.appendChild(flash);
+
+            // Shockwave explosion from center
+            const shockwave = document.createElement('div');
+            shockwave.className = 'fun-shockwave';
+            document.body.appendChild(shockwave);
+
+            // Spawn 3 haters being destroyed by the explosion
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const deadHater = document.createElement('img');
+                    deadHater.src = 'assets/img/hater.png';
+                    deadHater.className = 'fun-hater-target';
+                    deadHater.draggable = false;
+                    const sz = 60 + Math.random() * 50;
+                    deadHater.style.width = sz + 'px';
+                    deadHater.style.height = sz + 'px';
+                    deadHater.style.left = (100 + Math.random() * (window.innerWidth - 250)) + 'px';
+                    deadHater.style.top = (100 + Math.random() * (window.innerHeight - 300)) + 'px';
+                    overlay.appendChild(deadHater);
+                    // Immediately explode it
+                    setTimeout(() => {
+                        deadHater.classList.add('hit');
+                    }, 100);
+                }, i * 200);
+            }
+
+            // Clean up and win
+            setTimeout(() => {
+                flash.remove();
+                shockwave.remove();
+                gun.classList.remove('visible');
+                setTimeout(() => {
+                    gun.remove();
+                    overlay.querySelectorAll('.fun-hater-target').forEach(h => h.remove());
+                    // Set hits to 5 for the win
+                    haterHits = 5;
+                    updateHaterHUD();
+                    setTimeout(() => winHaterGame(), 300);
+                }, 500);
+            }, 1200);
+        }, 1000);
     }
 
     function winHaterGame() {
@@ -480,7 +568,7 @@
         document.body.style.overflow = '';
         phase2Active = false;
 
-        showFunModal('Parabéns! Você derrotou todos os Haters! 🎉 Agora pode explorar o restante do meu currículo.', () => {
+        showFunModal('Pronto, derrotamos todos eles! Juntos fazemos uma equipe incrível! Que tal tornarmos essa equipe realidade? Você conquistou a oportunidade de visualizar 100% do meu currículo, aproveite! Espero que retribua me dando a oportunidade de ingressar na sua equipe! 🎉', () => {
             revealAllSections();
         });
     }
@@ -500,7 +588,7 @@
         if (footer) { footer.style.display = ''; footer.style.animation = 'funFadeIn 0.8s ease forwards'; }
     }
 
-    /* ─── Dino Game Class ─── */
+    /* ─── Dino Game Class (Delta-Time Based) ─── */
     class DinoGame {
         constructor(canvas, onScore) {
             this.canvas = canvas;
@@ -508,8 +596,11 @@
             this.onScore = onScore;
             this.running = false;
             this.score = 0;
-            this.speed = 2.5;
-            this.frameCount = 0;
+            this.speed = 490; // pixels per second
+            this.elapsed = 0; // total elapsed time in seconds
+            this.lastTime = 0;
+            this.scoreAccum = 0;
+            this.obstacleAccum = 0;
 
             // Set canvas size
             this.canvas.width = 700;
@@ -528,7 +619,6 @@
 
             // Obstacles
             this.obstacles = [];
-            this.obstacleTimer = 0;
 
             // Ground
             this.groundOffset = 0;
@@ -536,6 +626,10 @@
             // Dino sprite
             this.dinoImg = new Image();
             this.dinoImg.src = 'assets/img/dinossauro-olimpic.png';
+
+            // Leg animation
+            this.legTimer = 0;
+            this.legFrame = false;
 
             // Input
             this.boundKeyDown = this.handleKey.bind(this);
@@ -546,6 +640,7 @@
             // Start
             this.running = true;
             this.gameOver = false;
+            this.lastTime = performance.now();
             this.loop();
         }
 
@@ -554,7 +649,6 @@
                 e.preventDefault();
                 this.jump();
             }
-            // Restart on game over
             if (this.gameOver && (e.code === 'Space' || e.code === 'ArrowUp')) {
                 e.preventDefault();
                 this.restart();
@@ -570,7 +664,7 @@
         }
 
         jump() {
-            this.dino.vy = -10;
+            this.dino.vy = -750; // pixels per second upward
             this.dino.jumping = true;
             this.dino.grounded = false;
         }
@@ -578,13 +672,14 @@
         restart() {
             this.score = Math.max(this.score, 0);
             this.obstacles = [];
-            this.obstacleTimer = 0;
+            this.obstacleAccum = 0;
             this.dino.y = 160;
             this.dino.vy = 0;
             this.dino.grounded = true;
             this.dino.jumping = false;
             this.gameOver = false;
-            this.speed = 2.5;
+            this.speed = 490;
+            this.lastTime = performance.now();
             this.loop();
         }
 
@@ -594,25 +689,33 @@
             this.canvas.removeEventListener('click', this.boundTouchStart);
         }
 
-        loop() {
+        loop(timestamp) {
             if (!this.running) return;
+
+            if (!timestamp) timestamp = performance.now();
+            let dt = (timestamp - this.lastTime) / 1000; // delta in seconds
+            this.lastTime = timestamp;
+
+            // Clamp dt to avoid huge jumps (e.g. tab switch)
+            if (dt > 0.1) dt = 0.016;
+
             if (this.gameOver) {
                 this.drawGameOver();
                 return;
             }
 
-            this.update();
+            this.update(dt);
             this.draw();
-            requestAnimationFrame(() => this.loop());
+            requestAnimationFrame((t) => this.loop(t));
         }
 
-        update() {
-            this.frameCount++;
+        update(dt) {
+            this.elapsed += dt;
 
             // Dino physics
             if (!this.dino.grounded) {
-                this.dino.vy += 0.5; // gravity (softer)
-                this.dino.y += this.dino.vy;
+                this.dino.vy += 2400 * dt; // gravity (px/s²)
+                this.dino.y += this.dino.vy * dt;
 
                 if (this.dino.y >= 160) {
                     this.dino.y = 160;
@@ -622,10 +725,17 @@
                 }
             }
 
-            // Obstacles — wider spacing
-            this.obstacleTimer++;
-            const minInterval = Math.max(60, 100 - this.speed * 3);
-            if (this.obstacleTimer > minInterval + Math.random() * 50) {
+            // Leg animation timer
+            this.legTimer += dt;
+            if (this.legTimer > 0.1) {
+                this.legTimer = 0;
+                this.legFrame = !this.legFrame;
+            }
+
+            // Obstacles — spawn based on time
+            this.obstacleAccum += dt;
+            const minInterval = Math.max(0.6, 1.2 - (this.speed - 490) * 0.002);
+            if (this.obstacleAccum > minInterval + Math.random() * 0.4) {
                 const h = 20 + Math.random() * 25;
                 this.obstacles.push({
                     x: this.canvas.width,
@@ -633,12 +743,12 @@
                     w: 15 + Math.random() * 12,
                     h: h
                 });
-                this.obstacleTimer = 0;
+                this.obstacleAccum = 0;
             }
 
             // Move obstacles
             for (let i = this.obstacles.length - 1; i >= 0; i--) {
-                this.obstacles[i].x -= this.speed;
+                this.obstacles[i].x -= this.speed * dt;
                 if (this.obstacles[i].x + this.obstacles[i].w < 0) {
                     this.obstacles.splice(i, 1);
                 }
@@ -657,19 +767,22 @@
                 }
             }
 
-            // Score
-            if (this.frameCount % 8 === 0) {
+            // Score — 1 point every ~0.13 seconds (same as old 8 frames at 60fps)
+            this.scoreAccum += dt;
+            if (this.scoreAccum >= 0.133) {
+                this.scoreAccum -= 0.133;
                 this.score++;
                 this.onScore(this.score);
             }
 
-            // Speed increase (slower ramp)
-            if (this.frameCount % 500 === 0) {
-                this.speed += 0.2;
-            }
+            // Speed increase — ramp smoothly from base to 2x based on score progress
+            const baseSpeed = 490;
+            const maxSpeed = baseSpeed * 1.6; // 784 px/s (20% less than 2x)
+            const progress = Math.min(1, this.score / 350); // 350 = targetScore
+            this.speed = baseSpeed + (maxSpeed - baseSpeed) * progress;
 
             // Ground scroll
-            this.groundOffset = (this.groundOffset + this.speed) % 20;
+            this.groundOffset = (this.groundOffset + this.speed * dt) % 20;
         }
 
         draw() {
@@ -677,7 +790,6 @@
             const W = this.canvas.width;
             const H = this.canvas.height;
 
-            // Clear
             ctx.fillStyle = '#f7f7f7';
             ctx.fillRect(0, 0, W, H);
 
@@ -700,7 +812,6 @@
             if (this.dinoImg.complete && this.dinoImg.naturalWidth > 0) {
                 ctx.drawImage(this.dinoImg, d.x - 10, d.y - 20, 60, 64);
             } else {
-                // Fallback rectangle
                 ctx.fillStyle = '#535353';
                 ctx.fillRect(d.x, d.y, d.w, d.h);
             }
@@ -708,9 +819,7 @@
             // Obstacles (cacti)
             ctx.fillStyle = '#535353';
             for (const obs of this.obstacles) {
-                // Main trunk
                 ctx.fillRect(obs.x + 2, obs.y, obs.w - 4, obs.h);
-                // Arms
                 if (obs.w > 20) {
                     ctx.fillRect(obs.x - 4, obs.y + 8, 8, 4);
                     ctx.fillRect(obs.x + obs.w - 4, obs.y + 12, 8, 4);
@@ -740,6 +849,122 @@
             ctx.font = '14px Courier New';
             ctx.fillText('Pressione ESPAÇO para continuar', W / 2, 120);
         }
+    }
+
+    /* ─── Footer Replay Buttons ─── */
+    document.addEventListener('DOMContentLoaded', () => {
+        const replayDino = document.getElementById('funReplayDino');
+        const replayHater = document.getElementById('funReplayHater');
+
+        if (replayDino) {
+            replayDino.addEventListener('click', () => {
+                replayDinoGame();
+            });
+        }
+
+        if (replayHater) {
+            replayHater.addEventListener('click', () => {
+                replayHaterGame();
+            });
+        }
+    });
+
+    function replayDinoGame() {
+        // Stop any existing game
+        if (dinoGame) dinoGame.stop();
+        document.body.style.overflow = 'hidden';
+        window.scrollTo(0, 0);
+
+        // Step 1: Show fake offline screen
+        const dinoScreen = document.getElementById('funDinoScreen');
+        if (dinoScreen) {
+            dinoScreen.style.transition = '';
+            dinoScreen.style.opacity = '1';
+            dinoScreen.classList.add('active');
+        }
+
+        // Step 2: After 4 seconds, show countdown modal
+        setTimeout(() => {
+            showReplayCountdown();
+        }, 4000);
+    }
+
+    function showReplayCountdown() {
+        const overlay = document.getElementById('funModalOverlay');
+        const emoji = document.getElementById('funModalEmoji');
+        const text = document.getElementById('funModalText');
+        const dodgeBtn = document.getElementById('funDodgeBtn');
+        const nextBtn = document.getElementById('funNextBtn');
+
+        dodgeBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+
+        emoji.innerHTML = '<img src="assets/img/dinossauro-olimpic.png" style="width:100px;height:100px;object-fit:contain;display:block;margin:0 auto">';
+        let countdown = 5;
+        text.innerHTML = 'Avance no jogo do dinossauro para liberar mais partes do meu currículo. Boa sorte!<br><br><span style="font-size:2.5rem;font-weight:800;color:#667eea">' + countdown + '</span>';
+
+        overlay.classList.add('active');
+
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                overlay.classList.remove('active');
+                nextBtn.style.display = '';
+                startReplayDinoGame();
+            } else {
+                text.innerHTML = 'Avance no jogo do dinossauro para liberar mais partes do meu currículo. Boa sorte!<br><br><span style="font-size:2.5rem;font-weight:800;color:#64ffda">' + countdown + '</span>';
+            }
+        }, 1000);
+    }
+
+    function startReplayDinoGame() {
+        // Show progress banner
+        let banner = document.getElementById('funRevealBanner');
+        if (banner) {
+            banner.classList.add('active');
+            banner.style.opacity = '1';
+            banner.style.transition = '';
+            const fill = document.getElementById('funRevealFill');
+            if (fill) fill.style.width = '0%';
+        }
+
+        const dinoScreen = document.getElementById('funDinoScreen');
+        const canvas = document.getElementById('funDinoCanvas');
+        dinoGame = new DinoGame(canvas, (score) => {
+            const fill = document.getElementById('funRevealFill');
+            const pct = Math.min(100, (score / 350) * 100);
+            if (fill) fill.style.width = pct + '%';
+
+            if (pct > 0 && dinoScreen) {
+                dinoScreen.style.opacity = Math.max(0.3, 1 - (pct / 100) * 0.7);
+            }
+
+            if (pct >= 100) {
+                setTimeout(() => {
+                    if (dinoScreen) {
+                        dinoScreen.style.transition = 'opacity 1s ease';
+                        dinoScreen.style.opacity = '0';
+                    }
+                    if (banner) {
+                        banner.style.transition = 'opacity 1s ease';
+                        banner.style.opacity = '0';
+                    }
+                    setTimeout(() => {
+                        if (dinoScreen) dinoScreen.classList.remove('active');
+                        document.body.style.overflow = '';
+                        if (dinoGame) dinoGame.stop();
+                    }, 1000);
+                }, 500);
+            }
+        });
+    }
+
+    function replayHaterGame() {
+        haterDeaths = 0;
+        autoHelpMode = false;
+        bangTriggered = false;
+        showBangExplosion();
     }
 
 })();

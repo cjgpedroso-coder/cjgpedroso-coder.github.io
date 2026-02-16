@@ -34,15 +34,27 @@
 
     <!-- ═══════════════════ FUN MODE — Fake Offline + Dino Game ═══════════════════ -->
     <div class="fun-dino-screen" id="funDinoScreen">
-        <div class="fun-offline-message">
-            <div class="fun-offline-icon">⚠️</div>
-            <h3 class="fun-offline-title">Sem conexão com a Internet</h3>
-            <p class="fun-offline-desc">Tente verificar os cabos de rede ou o roteador.</p>
+        <div class="fun-chrome-offline">
+            <div class="fun-chrome-offline-content">
+                <div class="fun-chrome-dino-icon">
+                    <img src="assets/img/img4.jpg" alt="Dino" class="fun-chrome-dino-img">
+                </div>
+                <h1 class="fun-chrome-title">Sem Internet</h1>
+                <div class="fun-chrome-suggestions">
+                    <p class="fun-chrome-try">Tente:</p>
+                    <ul class="fun-chrome-list">
+                        <li>Verificar os cabos de rede, modem e roteador</li>
+                        <li>Conectar à rede Wi-Fi novamente</li>
+                        <li><a href="#" class="fun-chrome-link" onclick="return false">Executar o Diagnóstico de Rede do
+                                Windows</a></li>
+                    </ul>
+                </div>
+                <p class="fun-chrome-error-code">ERR_INTERNET_DISCONNECTED</p>
+            </div>
+            <div class="fun-dino-canvas-wrapper">
+                <canvas id="funDinoCanvas"></canvas>
+            </div>
         </div>
-        <div class="fun-dino-canvas-wrapper">
-            <canvas id="funDinoCanvas"></canvas>
-        </div>
-        <p class="fun-dino-instructions">Pressione ESPAÇO ou clique para começar</p>
     </div>
 
     <!-- ═══════════════════ FUN MODE — Sequence Modals ═══════════════════ -->
@@ -210,7 +222,7 @@
                         <span class="highlight">Analista de Dados / Responsável Fiscal</span> na Romica Brasil.
                     </p>
                     <p>
-                        Proficiente em Excel avançado, Power BI, SQL (Firebase, MySQL, Oracle),
+                        Proficiente em Excel avançado, Power BI, SQL (MySQL, Oracle),
                         Python e automação de processos com IA. Forte capacidade analítica para
                         otimização de processos digitais e operacionais, e suporte à tomada de decisões estratégicas.
                     </p>
@@ -814,6 +826,13 @@
         <div class="footer-content">
 
             <p class="footer-text">Criado com <i class="fas fa-heart" style="color: #64ffda"></i> e muito café</p>
+            <div class="fun-footer-games" id="funFooterGames">
+                <p class="fun-footer-prompt">Já conhece a versão criativa? Então talvez queira voltar nesses dois 👇</p>
+                <div class="fun-footer-buttons">
+                    <button class="fun-footer-btn" id="funReplayDino">🦕 Dino</button>
+                    <button class="fun-footer-btn" id="funReplayHater">😈 Hater</button>
+                </div>
+            </div>
             <p class="footer-copy">&copy; 2026 Caio Pedroso. Todos os direitos reservados.</p>
         </div>
     </footer>
