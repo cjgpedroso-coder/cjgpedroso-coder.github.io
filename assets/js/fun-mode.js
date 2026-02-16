@@ -28,15 +28,13 @@
             document.body.style.overflow = 'hidden';
             dinoScreen.classList.add('active');
 
-            // Then fade out the entry overlay
-            entryOverlay.classList.add('hidden');
+            // Remove entry overlay instantly
+            entryOverlay.remove();
+
+            // After 4 seconds, show the "gotcha" modal
             setTimeout(() => {
-                entryOverlay.remove();
-                // After 4 seconds from now, show the "gotcha" modal
-                setTimeout(() => {
-                    showSequenceModal(0);
-                }, 4000);
-            }, 500);
+                showSequenceModal(0);
+            }, 4000);
         });
     }
 
