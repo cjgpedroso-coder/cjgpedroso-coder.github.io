@@ -257,8 +257,8 @@
 
                 setTimeout(() => {
                     dinoScreen.classList.remove('active');
-                    dinoScreen.remove();
-                    banner.remove();
+                    dinoScreen.style.display = 'none';
+                    banner.style.display = 'none';
                     document.body.style.overflow = '';
                     if (dinoGame) dinoGame.stop();
                     // Show 50% modal then setup Phase 2
@@ -448,14 +448,6 @@
             haterMisses++;
             updateHaterHUD();
 
-            // In auto-help mode, trigger the gun when down to 1 life
-            if (autoHelpMode && haterMisses >= 2 && !autoHelpTriggered) {
-                autoHelpTriggered = true;
-                clearTimeout(haterTimer);
-                setTimeout(() => triggerBangBangHelp(), 500);
-                return;
-            }
-
             if (haterMisses >= 3) {
                 haterGameRunning = false;
                 clearTimeout(haterTimer);
@@ -479,10 +471,13 @@
         overlay.classList.remove('active');
         haterDeaths++;
 
-        if (haterDeaths >= 1) {
-            showFunModal('Aqui, deixa eu te ajudar 😎', () => {
-                autoHelpMode = true;
-                startHaterGame();
+        if (haterDeaths >= 2) {
+            // 2nd death — show help modal, then execute bangbang immediately
+            showFunModal('Aqui, deixa eu te ajudar', () => {
+                // Re-activate overlay and trigger bangbang directly
+                overlay.classList.add('active');
+                haterGameRunning = true;
+                triggerBangBangHelp();
             });
         } else {
             showFunModal('Você morreu! Tente novamente. 💀', () => {
@@ -878,9 +873,16 @@
         // Step 1: Show fake offline screen
         const dinoScreen = document.getElementById('funDinoScreen');
         if (dinoScreen) {
+            dinoScreen.style.display = '';
             dinoScreen.style.transition = '';
             dinoScreen.style.opacity = '1';
             dinoScreen.classList.add('active');
+        }
+
+        // Also reset the banner
+        const banner = document.getElementById('funRevealBanner');
+        if (banner) {
+            banner.style.display = '';
         }
 
         // Step 2: After 4 seconds, show countdown modal
