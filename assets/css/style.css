@@ -476,6 +476,26 @@ img {
     margin-bottom: 50px;
     opacity: 0;
     animation: fadeInUp 0.8s ease 0.9s forwards;
+    min-height: 1.6em;
+}
+
+.typing-cursor {
+    color: var(--accent);
+    font-weight: 300;
+    animation: blink 0.8s step-end infinite;
+    margin-left: 2px;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
 }
 
 .hero-cta {
@@ -643,25 +663,58 @@ img {
     height: 76px;
     overflow: hidden;
     cursor: pointer;
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-        height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-        border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-        padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+        height 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+        border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+        padding 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
         box-shadow 0.3s ease;
 }
 
-/* Hide everything except photo in compact mode */
+/* Hide everything except photo in compact mode (reverse staggered delays for closing) */
 .sidebar-name,
-.sidebar-role,
-.sidebar-divider,
-.sidebar-info,
+.sidebar-role {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    transition: opacity 0.3s ease 0.15s, max-height 0.4s ease 0.15s, margin 0.4s ease 0.15s;
+}
+
+.sidebar-divider {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    transition: opacity 0.3s ease 0.1s, max-height 0.4s ease 0.1s, margin 0.4s ease 0.1s;
+}
+
+.sidebar-info {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    transition: opacity 0.3s ease 0.1s, max-height 0.4s ease 0.1s;
+}
+
 .sidebar-socials {
     opacity: 0;
     max-height: 0;
     overflow: hidden;
     margin: 0;
     padding: 0;
-    transition: opacity 0.4s ease 0s, max-height 0.5s ease;
+    transition: opacity 0.3s ease 0.05s, max-height 0.4s ease 0.05s;
+}
+
+.sidebar-location {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    transition: opacity 0.3s ease 0s, max-height 0.4s ease 0s;
 }
 
 /* ─── Expanded state: full card ─── */
@@ -669,7 +722,13 @@ img {
     border-radius: var(--radius-lg);
     padding: 35px 25px;
     width: var(--sidebar-width);
-    height: 480px;
+    height: 580px;
+    padding-bottom: 40px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+        height 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+        border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+        padding 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+        box-shadow 0.3s ease;
 }
 
 .sidebar.sidebar-expanded .sidebar-name,
@@ -677,26 +736,39 @@ img {
     opacity: 1;
     max-height: 100px;
     margin-bottom: 4px;
-    transition: opacity 0.4s ease 0.2s, max-height 0.5s ease;
+    transition: opacity 0.4s ease 0.2s, max-height 0.5s ease 0.1s, margin 0.5s ease 0.1s;
 }
 
 .sidebar.sidebar-expanded .sidebar-divider {
     opacity: 1;
     max-height: 20px;
     margin: 20px 0;
-    transition: opacity 0.4s ease 0.25s, max-height 0.5s ease;
+    transition: opacity 0.4s ease 0.25s, max-height 0.5s ease 0.1s, margin 0.5s ease 0.1s;
 }
 
 .sidebar.sidebar-expanded .sidebar-info {
     opacity: 1;
     max-height: 200px;
-    transition: opacity 0.4s ease 0.3s, max-height 0.5s ease;
+    transition: opacity 0.4s ease 0.3s, max-height 0.5s ease 0.15s;
 }
 
 .sidebar.sidebar-expanded .sidebar-socials {
     opacity: 1;
-    max-height: 60px;
-    transition: opacity 0.4s ease 0.35s, max-height 0.5s ease;
+    max-height: 120px;
+    transition: opacity 0.4s ease 0.35s, max-height 0.5s ease 0.2s;
+}
+
+.sidebar.sidebar-expanded .sidebar-location {
+    opacity: 1;
+    max-height: 50px;
+    margin-top: 16px;
+    transition: opacity 0.4s ease 0.4s, max-height 0.5s ease 0.25s, margin 0.5s ease 0.25s;
+}
+
+.sidebar-location {
+    justify-content: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
 }
 
 .sidebar-photo {
@@ -784,29 +856,77 @@ img {
     font-size: 0.8rem;
 }
 
-.sidebar-socials {
-    display: flex;
-    gap: 12px;
-}
-
-.social-link {
-    width: 38px;
-    height: 38px;
+/* ─── Contact Buttons (email, whatsapp) ─── */
+.info-btn {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    background: rgba(100, 255, 218, 0.04);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    font-size: 0.9rem;
     transition: var(--transition);
+    margin-top: 8px;
 }
 
-.social-link:hover {
+.info-btn i {
+    font-size: 1rem;
+}
+
+.info-btn:hover {
     color: var(--accent);
     border-color: var(--accent);
     background: var(--accent-dim);
-    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(100, 255, 218, 0.1);
+    transform: translateY(-2px);
+}
+
+.sidebar-info {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.sidebar-socials {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+/* ─── Social Buttons (full-width) ─── */
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    background: rgba(100, 255, 218, 0.04);
+    transition: var(--transition);
+}
+
+.social-btn i {
+    font-size: 1rem;
+}
+
+.social-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    box-shadow: 0 0 15px rgba(100, 255, 218, 0.1);
+    transform: translateY(-2px);
 }
 
 .sidebar-btn {
@@ -866,13 +986,13 @@ img {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-md);
     padding: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 25px rgba(100, 255, 218, 0.15), 0 0 50px rgba(100, 255, 218, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 10px rgba(100, 255, 218, 0.06), 0 0 20px rgba(100, 255, 218, 0.03);
     transition: var(--transition);
 }
 
 .glass-card:hover {
     border-color: rgba(100, 255, 218, 0.22);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 35px rgba(100, 255, 218, 0.25), 0 0 70px rgba(100, 255, 218, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 15px rgba(100, 255, 218, 0.1), 0 0 30px rgba(100, 255, 218, 0.05);
 }
 
 /* ═══════════════════════════════════════

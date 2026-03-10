@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initProjectCards();
     initMobileContactFab();
     initAceternityTimeline();
+    initTypingAnimation();
 });
 
 /* ═══════════════════════════════════════
@@ -520,4 +521,63 @@ function initAceternityTimeline() {
 
     // Initial call
     updateTimeline();
+}
+
+/* ═══════════════════════════════════════
+   TYPING ANIMATION — Hero Subtitle
+   ═══════════════════════════════════════ */
+function initTypingAnimation() {
+    const el = document.getElementById('typingText');
+    if (!el) return;
+
+    const phrases = [
+        'Business Intelligence Analyst',
+        'Business Automation'
+    ];
+
+    const typeSpeed = 60;
+    const eraseSpeed = 30;
+    const pauseAfterType = 2000;
+    const pauseAfterErase = 500;
+
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isErasing = false;
+
+    // Wait for hero fadeIn animation to finish (0.9s delay + 0.8s duration)
+    setTimeout(() => {
+        typeLoop();
+    }, 1800);
+
+    function typeLoop() {
+        const currentPhrase = phrases[phraseIndex];
+
+        if (!isErasing) {
+            // Typing
+            el.textContent = currentPhrase.substring(0, charIndex + 1);
+            charIndex++;
+
+            if (charIndex < currentPhrase.length) {
+                setTimeout(typeLoop, typeSpeed);
+            } else {
+                // Finished typing, pause then erase
+                isErasing = true;
+                setTimeout(typeLoop, pauseAfterType);
+            }
+        } else {
+            // Erasing
+            el.textContent = currentPhrase.substring(0, charIndex);
+            charIndex--;
+
+            if (charIndex >= 0) {
+                setTimeout(typeLoop, eraseSpeed);
+            } else {
+                // Finished erasing, move to next phrase
+                isErasing = false;
+                charIndex = 0;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                setTimeout(typeLoop, pauseAfterErase);
+            }
+        }
+    }
 }
