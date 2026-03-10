@@ -14,16 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initActiveNavLink();
     initProjectCards();
     initMobileContactFab();
+    initAceternityTimeline();
 });
 
 /* ═══════════════════════════════════════
-   NAVBAR — Scroll Effects
+   NAVBAR — Scroll Effects + Sidebar Compact/Expand
    ═══════════════════════════════════════ */
 function initNavbar() {
     const navbar = document.getElementById('navbar');
     const sidebar = document.querySelector('.sidebar');
     const hero = document.querySelector('.hero');
     let lastScroll = 0;
+    let userToggled = false;
 
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
@@ -41,11 +43,49 @@ function initNavbar() {
                 sidebar.classList.add('sidebar-visible');
             } else {
                 sidebar.classList.remove('sidebar-visible');
+                sidebar.classList.remove('sidebar-expanded');
+            }
+
+            // Auto-expand at bottom of page, collapse when scrolling up
+            if (!userToggled) {
+                const nearBottom = (window.innerHeight + currentScroll) >= (document.body.scrollHeight - 150);
+                if (nearBottom) {
+                    sidebar.classList.add('sidebar-expanded');
+                } else {
+                    sidebar.classList.remove('sidebar-expanded');
+                }
             }
         }
 
         lastScroll = currentScroll;
     }, { passive: true });
+
+    // Click sidebar to toggle expand/collapse
+    if (sidebar) {
+        sidebar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userToggled = true;
+            sidebar.classList.toggle('sidebar-expanded');
+            // Reset userToggled after a scroll so auto-expand can work again
+            setTimeout(() => { userToggled = false; }, 3000);
+        });
+
+        // Close on click outside
+        document.addEventListener('click', (e) => {
+            if (!sidebar.contains(e.target)) {
+                sidebar.classList.remove('sidebar-expanded');
+                userToggled = false;
+            }
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                sidebar.classList.remove('sidebar-expanded');
+                userToggled = false;
+            }
+        });
+    }
 }
 
 /* ═══════════════════════════════════════
@@ -404,4 +444,80 @@ function initMobileContactFab() {
             fab.classList.remove('expanded');
         }
     });
+}
+
+/* ═══════════════════════════════════════
+   ACETERNITY TIMELINE — Scroll Progress + Date Fadeout
+   ═══════════════════════════════════════ */
+function initAceternityTimeline() {
+    const container = document.getElementById('aceTimeline');
+    const progress = document.getElementById('aceLineProgress');
+    if (!container || !progress) return;
+
+    const entries = container.querySelectorAll('.ace-timeline-entry');
+    let ticking = false;
+
+    function updateTimeline() {
+        const containerRect = container.getBoundingClientRect();
+        const containerHeight = container.scrollHeight;
+        const windowHeight = window.innerHeight;
+
+        // ─── Green line progress ───
+        const startOffset = windowHeight * 0.1;
+        const endOffset = windowHeight * 0.5;
+        const scrollRange = containerHeight + startOffset - endOffset;
+        const scrolled = startOffset - containerRect.top;
+        const rawProgress = Math.max(0, Math.min(1, scrolled / scrollRange));
+
+        const progressHeight = rawProgress * containerHeight;
+        progress.style.height = progressHeight + 'px';
+        progress.style.opacity = rawProgress > 0 ? '1' : '0';
+
+        // ─── Date fadeout + dot activation ───
+        const triggerPoint = windowHeight * 0.35;
+
+        entries.forEach((entry, i) => {
+            const entryRect = entry.getBoundingClientRect();
+            const title = entry.querySelector('.ace-timeline-title');
+            const dot = entry.querySelector('.ace-timeline-dot');
+            const nextEntry = entries[i + 1];
+
+            // Activate dot when entry is in view
+            if (entryRect.top < windowHeight * 0.6) {
+                if (dot) {
+                    dot.style.background = 'var(--accent)';
+                    dot.style.borderColor = 'var(--accent)';
+                    dot.style.boxShadow = '0 0 12px var(--accent-glow)';
+                }
+            } else {
+                if (dot && !dot.classList.contains('ace-timeline-dot-fork')) {
+                    dot.style.background = 'var(--bg-tertiary)';
+                    dot.style.borderColor = 'var(--text-muted)';
+                    dot.style.boxShadow = 'none';
+                }
+            }
+
+            // Fade out title when next entry reaches trigger point
+            if (title && nextEntry) {
+                const nextRect = nextEntry.getBoundingClientRect();
+                if (nextRect.top < triggerPoint) {
+                    title.classList.add('faded');
+                } else {
+                    title.classList.remove('faded');
+                }
+            }
+        });
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(updateTimeline);
+            ticking = true;
+        }
+    }, { passive: true });
+
+    // Initial call
+    updateTimeline();
 }
