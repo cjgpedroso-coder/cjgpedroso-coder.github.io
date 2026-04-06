@@ -1,142 +1,104 @@
 /* ═══════════════════════════════════════════════════════
-   PREMIUM DARK RESUME — INTERACTIVE SCRIPTS
+   PORTFOLIO DASHBOARD — SCRIPTS
    ═══════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
-    initThemeToggle();
-    initNavbar();
-    initParticles();
+    initMobileMenu();
+    initNavTabs();
     initScrollAnimations();
-    initSkillBars();
-    initStatCounters();
-    initGalleryLightbox();
-    initMobileNav();
-    initActiveNavLink();
+    initSidebarSkills();
+    initIASkills();
+    initHeroStats();
     initProjectCards();
-    initMobileContactFab();
-    initAceternityTimeline();
     initTypingAnimation();
 });
 
 /* ═══════════════════════════════════════
-   NAVBAR — Scroll Effects + Sidebar Compact/Expand
+   MOBILE MENU — Sidebar Toggle
    ═══════════════════════════════════════ */
-function initNavbar() {
-    const navbar = document.getElementById('navbar');
-    const sidebar = document.querySelector('.sidebar');
-    const hero = document.querySelector('.hero');
-    let lastScroll = 0;
-    let userToggled = false;
+function initMobileMenu() {
+    const toggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
 
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
+    if (!toggle || !sidebar) return;
 
-        if (currentScroll > 80) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-
-        // Show sidebar after scrolling past hero
-        if (sidebar && hero) {
-            const heroBottom = hero.offsetTop + hero.offsetHeight;
-            if (currentScroll > heroBottom - 200) {
-                sidebar.classList.add('sidebar-visible');
-            } else {
-                sidebar.classList.remove('sidebar-visible');
-                sidebar.classList.remove('sidebar-expanded');
-            }
-
-            // Auto-expand at bottom of page, collapse when scrolling up
-            if (!userToggled) {
-                const nearBottom = (window.innerHeight + currentScroll) >= (document.body.scrollHeight - 150);
-                if (nearBottom) {
-                    sidebar.classList.add('sidebar-expanded');
-                } else {
-                    sidebar.classList.remove('sidebar-expanded');
-                }
-            }
-        }
-
-        lastScroll = currentScroll;
-    }, { passive: true });
-
-    // Click sidebar to toggle expand/collapse
-    if (sidebar) {
-        sidebar.addEventListener('click', (e) => {
-            e.stopPropagation();
-            userToggled = true;
-            sidebar.classList.toggle('sidebar-expanded');
-            // Reset userToggled after a scroll so auto-expand can work again
-            setTimeout(() => { userToggled = false; }, 3000);
-        });
-
-        // Close on click outside
-        document.addEventListener('click', (e) => {
-            if (!sidebar.contains(e.target)) {
-                sidebar.classList.remove('sidebar-expanded');
-                userToggled = false;
-            }
-        });
-
-        // Close on Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                sidebar.classList.remove('sidebar-expanded');
-                userToggled = false;
-            }
-        });
+    function openMenu() {
+        toggle.classList.add('active');
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
+
+    function closeMenu() {
+        toggle.classList.remove('active');
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    toggle.addEventListener('click', () => {
+        if (sidebar.classList.contains('open')) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    });
+
+    overlay.addEventListener('click', closeMenu);
+
+    const closeBtn = document.getElementById('sidebarClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMenu();
+    });
 }
 
 /* ═══════════════════════════════════════
-   PARTICLES — Floating Background
+   NAVIGATION TABS — Scroll Spy
    ═══════════════════════════════════════ */
-function initParticles() {
-    const container = document.getElementById('particles');
-    if (!container) return;
+function initNavTabs() {
+    const tabs = document.querySelectorAll('.nav-tab');
+    const sections = document.querySelectorAll('.content-section');
+    if (!tabs.length || !sections.length) return;
 
-    const particleCount = 40;
-
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
-
-        const size = Math.random() * 3 + 1;
-        const left = Math.random() * 100;
-        const duration = Math.random() * 8 + 6;
-        const delay = Math.random() * 10;
-
-        particle.style.cssText = `
-            width: ${size}px;
-            height: ${size}px;
-            left: ${left}%;
-            bottom: -10px;
-            animation-duration: ${duration}s;
-            animation-delay: ${delay}s;
-        `;
-
-        container.appendChild(particle);
+    function showSection(targetId) {
+        sections.forEach(section => {
+            section.style.display = section.id === targetId ? '' : 'none';
+        });
+        tabs.forEach(tab => {
+            tab.classList.toggle('active', tab.getAttribute('data-target') === targetId);
+        });
     }
+
+    // Click handler
+    tabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection(tab.getAttribute('data-target'));
+        });
+    });
+
+    // Show first section by default
+    showSection('sobre');
 }
 
 /* ═══════════════════════════════════════
    SCROLL ANIMATIONS — Intersection Observer
    ═══════════════════════════════════════ */
 function initScrollAnimations() {
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px 0px -80px 0px',
-        threshold: 0.1,
-    };
-
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
             }
         });
-    }, observerOptions);
+    }, {
+        root: null,
+        rootMargin: '0px 0px -60px 0px',
+        threshold: 0.1,
+    });
 
     document.querySelectorAll('[data-aos]').forEach((el) => {
         observer.observe(el);
@@ -144,11 +106,29 @@ function initScrollAnimations() {
 }
 
 /* ═══════════════════════════════════════
-   SKILL BARS — Animated Fill
+   SIDEBAR SKILLS — Animated Fill on Load
    ═══════════════════════════════════════ */
-function initSkillBars() {
-    const skillSection = document.getElementById('habilidades');
-    if (!skillSection) return;
+function initSidebarSkills() {
+    const bars = document.querySelectorAll('.sidebar-skill-fill');
+    if (!bars.length) return;
+
+    // Animate after a short delay for visual impact
+    setTimeout(() => {
+        bars.forEach((bar, index) => {
+            const width = bar.getAttribute('data-width');
+            setTimeout(() => {
+                bar.style.width = width + '%';
+            }, index * 120);
+        });
+    }, 500);
+}
+
+/* ═══════════════════════════════════════
+   IA SKILLS — Animated Fill on Scroll
+   ═══════════════════════════════════════ */
+function initIASkills() {
+    const section = document.getElementById('ia');
+    if (!section) return;
 
     let animated = false;
 
@@ -156,30 +136,24 @@ function initSkillBars() {
         entries.forEach((entry) => {
             if (entry.isIntersecting && !animated) {
                 animated = true;
-                animateSkillBars();
+                const bars = section.querySelectorAll('.ia-bar-fill');
+                bars.forEach((bar, index) => {
+                    const width = bar.getAttribute('data-width');
+                    setTimeout(() => {
+                        bar.style.width = width + '%';
+                    }, index * 150);
+                });
             }
         });
-    }, { threshold: 0.2 });
+    }, { threshold: 0.3 });
 
-    observer.observe(skillSection);
-}
-
-function animateSkillBars() {
-    const bars = document.querySelectorAll('.skill-bar-fill');
-
-    bars.forEach((bar, index) => {
-        const targetWidth = bar.getAttribute('data-width');
-        setTimeout(() => {
-            bar.style.width = targetWidth + '%';
-            bar.classList.add('animated');
-        }, index * 100);
-    });
+    observer.observe(section);
 }
 
 /* ═══════════════════════════════════════
-   STAT COUNTERS — Animated Numbers
+   HERO STATS — Animated Counters
    ═══════════════════════════════════════ */
-function initStatCounters() {
+function initHeroStats() {
     const stats = document.querySelectorAll('.stat-number[data-target]');
     if (!stats.length) return;
 
@@ -199,14 +173,12 @@ function initStatCounters() {
 
 function animateCounter(el) {
     const target = parseInt(el.getAttribute('data-target'));
-    const duration = 2000;
+    const duration = 1800;
     const start = performance.now();
 
     function update(currentTime) {
         const elapsed = currentTime - start;
         const progress = Math.min(elapsed / duration, 1);
-
-        // Ease out cubic
         const eased = 1 - Math.pow(1 - progress, 3);
         const current = Math.floor(eased * target);
 
@@ -223,120 +195,6 @@ function animateCounter(el) {
 }
 
 /* ═══════════════════════════════════════
-   GALLERY LIGHTBOX
-   ═══════════════════════════════════════ */
-function initGalleryLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightboxImg');
-    const closeBtn = document.querySelector('.lightbox-close');
-
-    if (!lightbox || !lightboxImg) return;
-
-    document.querySelectorAll('.gallery-item').forEach((item) => {
-        item.addEventListener('click', () => {
-            const img = item.querySelector('img');
-            lightboxImg.src = img.src;
-            lightboxImg.alt = img.alt;
-            lightbox.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-    });
-
-    function closeLightbox() {
-        lightbox.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    closeBtn.addEventListener('click', closeLightbox);
-
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeLightbox();
-    });
-}
-
-/* ═══════════════════════════════════════
-   MOBILE NAVIGATION
-   ═══════════════════════════════════════ */
-function initMobileNav() {
-    const toggle = document.getElementById('navToggle');
-    const navLinks = document.querySelector('.nav-links');
-
-    if (!toggle || !navLinks) return;
-
-    toggle.addEventListener('click', () => {
-        toggle.classList.toggle('active');
-        navLinks.classList.toggle('open');
-    });
-
-    navLinks.querySelectorAll('.nav-link').forEach((link) => {
-        link.addEventListener('click', () => {
-            toggle.classList.remove('active');
-            navLinks.classList.remove('open');
-        });
-    });
-}
-
-/* ═══════════════════════════════════════
-   ACTIVE NAV LINK — Scroll Spy
-   ═══════════════════════════════════════ */
-function initActiveNavLink() {
-    const sections = document.querySelectorAll('.section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    window.addEventListener('scroll', () => {
-        let current = '';
-        const scrollPos = window.pageYOffset + 150;
-
-        sections.forEach((section) => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-
-            if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        navLinks.forEach((link) => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === '#' + current) {
-                link.classList.add('active');
-            }
-        });
-    }, { passive: true });
-}
-
-/* ═══════════════════════════════════════
-   THEME TOGGLE — Dark / Light
-   ═══════════════════════════════════════ */
-function initThemeToggle() {
-    const toggleBtn = document.getElementById('themeToggle');
-    if (!toggleBtn) return;
-
-    // Load saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-    }
-
-    toggleBtn.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
-        if (newTheme === 'dark') {
-            document.documentElement.removeAttribute('data-theme');
-        } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
-
-        localStorage.setItem('theme', newTheme);
-    });
-}
-
-/* ═══════════════════════════════════════
    PROJECT CARDS — Modal
    ═══════════════════════════════════════ */
 function initProjectCards() {
@@ -344,28 +202,24 @@ function initProjectCards() {
     const modal = document.getElementById('projectModal');
     if (!cards.length || !modal) return;
 
-    const modalImg = document.getElementById('projectModalImg');
-    const modalTags = document.getElementById('projectModalTags');
-    const modalTitle = document.getElementById('projectModalTitle');
-    const modalDesc = document.getElementById('projectModalDesc');
-    const closeBtn = modal.querySelector('.project-modal-close');
-    const overlay = modal.querySelector('.project-modal-overlay');
+    const modalImg = document.getElementById('modalImg');
+    const modalTags = document.getElementById('modalTags');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const closeBtn = modal.querySelector('.modal-close');
 
     cards.forEach(card => {
         card.addEventListener('click', () => {
-            // Get data from the card
-            const img = card.querySelector('.project-image img');
+            const img = card.querySelector('.project-img img');
             const tags = card.querySelectorAll('.project-tags .tag');
             const title = card.querySelector('.project-title');
             const desc = card.querySelector('.project-desc');
 
-            // Populate modal
             modalImg.src = img.src;
             modalImg.alt = img.alt;
             modalTitle.textContent = title.textContent;
             modalDesc.textContent = desc.textContent;
 
-            // Clone tags
             modalTags.innerHTML = '';
             tags.forEach(tag => {
                 const span = document.createElement('span');
@@ -374,7 +228,6 @@ function initProjectCards() {
                 modalTags.appendChild(span);
             });
 
-            // Show modal
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
@@ -386,141 +239,16 @@ function initProjectCards() {
     }
 
     closeBtn.addEventListener('click', closeModal);
-    overlay.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modal.classList.contains('active')) {
             closeModal();
         }
     });
-}
-
-/* ═══════════════════════════════════════
-   MOBILE FLOATING CONTACT FAB
-   ═══════════════════════════════════════ */
-function initMobileContactFab() {
-    const fab = document.getElementById('mobileContactFab');
-    if (!fab) return;
-
-    const sobreSection = document.getElementById('sobre');
-    if (!sobreSection) return;
-
-    let autoExpanded = false;
-
-    // Show/hide based on scroll position (visible from "Sobre mim" onward)
-    window.addEventListener('scroll', () => {
-        const sobreTop = sobreSection.offsetTop - 200;
-        const scrollY = window.pageYOffset;
-
-        if (scrollY > sobreTop) {
-            fab.classList.add('visible');
-        } else {
-            fab.classList.remove('visible');
-            fab.classList.remove('expanded');
-        }
-
-        // Auto-expand at bottom of page
-        const nearBottom = (window.innerHeight + scrollY) >= (document.body.scrollHeight - 100);
-        if (nearBottom && !autoExpanded) {
-            autoExpanded = true;
-            fab.classList.add('expanded');
-        }
-    });
-
-    // Toggle on click (on the photo bubble)
-    fab.addEventListener('click', (e) => {
-        e.stopPropagation();
-        fab.classList.toggle('expanded');
-    });
-
-    // Close when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!fab.contains(e.target)) {
-            fab.classList.remove('expanded');
-        }
-    });
-
-    // Close on Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            fab.classList.remove('expanded');
-        }
-    });
-}
-
-/* ═══════════════════════════════════════
-   ACETERNITY TIMELINE — Scroll Progress + Date Fadeout
-   ═══════════════════════════════════════ */
-function initAceternityTimeline() {
-    const container = document.getElementById('aceTimeline');
-    const progress = document.getElementById('aceLineProgress');
-    if (!container || !progress) return;
-
-    const entries = container.querySelectorAll('.ace-timeline-entry');
-    let ticking = false;
-
-    function updateTimeline() {
-        const containerRect = container.getBoundingClientRect();
-        const containerHeight = container.scrollHeight;
-        const windowHeight = window.innerHeight;
-
-        // ─── Green line progress ───
-        const startOffset = windowHeight * 0.1;
-        const endOffset = windowHeight * 0.5;
-        const scrollRange = containerHeight + startOffset - endOffset;
-        const scrolled = startOffset - containerRect.top;
-        const rawProgress = Math.max(0, Math.min(1, scrolled / scrollRange));
-
-        const progressHeight = rawProgress * containerHeight;
-        progress.style.height = progressHeight + 'px';
-        progress.style.opacity = rawProgress > 0 ? '1' : '0';
-
-        // ─── Date fadeout + dot activation ───
-        const triggerPoint = windowHeight * 0.35;
-
-        entries.forEach((entry, i) => {
-            const entryRect = entry.getBoundingClientRect();
-            const title = entry.querySelector('.ace-timeline-title');
-            const dot = entry.querySelector('.ace-timeline-dot');
-            const nextEntry = entries[i + 1];
-
-            // Activate dot when entry is in view
-            if (entryRect.top < windowHeight * 0.6) {
-                if (dot) {
-                    dot.style.background = 'var(--accent)';
-                    dot.style.borderColor = 'var(--accent)';
-                    dot.style.boxShadow = '0 0 12px var(--accent-glow)';
-                }
-            } else {
-                if (dot && !dot.classList.contains('ace-timeline-dot-fork')) {
-                    dot.style.background = 'var(--bg-tertiary)';
-                    dot.style.borderColor = 'var(--text-muted)';
-                    dot.style.boxShadow = 'none';
-                }
-            }
-
-            // Fade out title when next entry reaches trigger point
-            if (title && nextEntry) {
-                const nextRect = nextEntry.getBoundingClientRect();
-                if (nextRect.top < triggerPoint) {
-                    title.classList.add('faded');
-                } else {
-                    title.classList.remove('faded');
-                }
-            }
-        });
-
-        ticking = false;
-    }
-
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            requestAnimationFrame(updateTimeline);
-            ticking = true;
-        }
-    }, { passive: true });
-
-    // Initial call
-    updateTimeline();
 }
 
 /* ═══════════════════════════════════════
@@ -531,48 +259,42 @@ function initTypingAnimation() {
     if (!el) return;
 
     const phrases = [
-        'Business Intelligence Analyst',
+        'BI Analyst',
         'Business Automation'
     ];
 
-    const typeSpeed = 60;
-    const eraseSpeed = 30;
-    const pauseAfterType = 2000;
-    const pauseAfterErase = 500;
+    const typeSpeed = 65;
+    const eraseSpeed = 35;
+    const pauseAfterType = 2200;
+    const pauseAfterErase = 400;
 
     let phraseIndex = 0;
     let charIndex = 0;
     let isErasing = false;
 
-    // Wait for hero fadeIn animation to finish (0.9s delay + 0.8s duration)
-    setTimeout(() => {
-        typeLoop();
-    }, 1800);
+    // Start after a brief delay
+    setTimeout(typeLoop, 800);
 
     function typeLoop() {
         const currentPhrase = phrases[phraseIndex];
 
         if (!isErasing) {
-            // Typing
             el.textContent = currentPhrase.substring(0, charIndex + 1);
             charIndex++;
 
             if (charIndex < currentPhrase.length) {
                 setTimeout(typeLoop, typeSpeed);
             } else {
-                // Finished typing, pause then erase
                 isErasing = true;
                 setTimeout(typeLoop, pauseAfterType);
             }
         } else {
-            // Erasing
             el.textContent = currentPhrase.substring(0, charIndex);
             charIndex--;
 
             if (charIndex >= 0) {
                 setTimeout(typeLoop, eraseSpeed);
             } else {
-                // Finished erasing, move to next phrase
                 isErasing = false;
                 charIndex = 0;
                 phraseIndex = (phraseIndex + 1) % phrases.length;
