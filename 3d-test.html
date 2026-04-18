@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Test</title>
+    <style>
+        * { margin: 0; padding: 0; }
+        body { background: #0b0b0f; overflow: hidden; }
+        #info { position: fixed; top: 10px; left: 10px; color: #e8b84b; font-family: monospace; font-size: 13px; z-index: 10; white-space: pre; }
+    </style>
+</head>
+<body>
+    <div id="info">Testing...</div>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const info = document.getElementById('info');
+        function log(msg) { info.textContent += '\n' + msg; console.log(msg); }
+
+        log('Three.js loaded: ' + THREE.REVISION);
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b0b0f);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(3, 3, 3);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 1));
+        const dl = new THREE.DirectionalLight(0xffffff, 2);
+        dl.position.set(3, 5, 3);
+        scene.add(dl);
+
+        // Test cube first
+        const cube = new THREE.Mesh(
+            new THREE.BoxGeometry(0.3, 0.3, 0.3),
+            new THREE.MeshStandardMaterial({ color: 0xe8b84b })
+        );
+        cube.position.set(0, 2, 0);
+        scene.add(cube);
+        log('Test cube added.');
+
+        // Try loading GLB
+        log('Loading notebook.glb...');
+        const loader = new GLTFLoader();
+
+        try {
+            loader.load(
+                'assets/models/notebook.glb',
+                (gltf) => {
+                    log('✅ GLB loaded successfully!');
+                    log('Animations: ' + gltf.animations.length);
+                    log('Scene children: ' + gltf.scene.children.length);
+
+                    const model = gltf.scene;
+                    const box = new THREE.Box3().setFromObject(model);
+                    const size = box.getSize(new THREE.Vector3());
+                    log('Model size: ' + size.x.toFixed(2) + ' x ' + size.y.toFixed(2) + ' x ' + size.z.toFixed(2));
+
+                    const scale = 2 / Math.max(size.x, size.y, size.z);
+                    model.scale.setScalar(scale);
+                    const center = box.getCenter(new THREE.Vector3());
+                    model.position.sub(center.multiplyScalar(scale));
+
+                    scene.add(model);
+                    scene.remove(cube);
+                    log('Model added to scene.');
+                },
+                (progress) => {
+                    const loaded = progress.loaded;
+                    const total = progress.total || 0;
+                    log(`Progress: ${(loaded/1024/1024).toFixed(1)}MB / ${(total/1024/1024).toFixed(1)}MB`);
+                },
+                (error) => {
+                    log('❌ GLB load ERROR: ' + error.message);
+                    console.error(error);
+                }
+            );
+        } catch(e) {
+            log('❌ Exception: ' + e.message);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cube.rotation.y += 0.01;
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Viewer — Notebook</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0b0b0f; color: #e8e8e8; font-family: 'Inter', system-ui, sans-serif; overflow: hidden; height: 100vh; }
+        #canvas-container { width: 100%; height: 100vh; }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .viewer-header {
+            position: fixed; top: 0; left: 0; right: 0; padding: 16px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 10; background: linear-gradient(to bottom, rgba(11,11,15,0.9) 0%, transparent 100%);
+        }
+        .viewer-title { font-size: 1rem; font-weight: 700; color: #e8b84b; }
+        .viewer-back {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px; font-size: 0.75rem; font-weight: 600;
+            color: #e8e8e8; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+            text-decoration: none; transition: all 0.3s ease;
+        }
+        .viewer-back:hover { background: rgba(232,184,75,0.15); border-color: #e8b84b; color: #e8b84b; }
+
+        .viewer-controls {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 8px; z-index: 10; flex-wrap: wrap; justify-content: center;
+        }
+        .control-btn {
+            padding: 10px 18px; font-size: 0.72rem; font-weight: 600;
+            color: #ccc; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .control-btn:hover { background: rgba(232,184,75,0.15); border-color: #e8b84b; color: #e8b84b; }
+        .control-btn.active { background: rgba(232,184,75,0.2); border-color: #e8b84b; color: #e8b84b; }
+
+        .loading-overlay {
+            position: fixed; inset: 0; background: #0b0b0f;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 16px; z-index: 100; transition: opacity 0.6s ease;
+        }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .loading-spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(232,184,75,0.2);
+            border-top-color: #e8b84b; border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        .loading-text { font-size: 0.85rem; color: #888; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hint { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: #555; z-index: 10; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <span class="loading-text" id="loadingText">Carregando modelo 3D...</span>
+    </div>
+
+    <header class="viewer-header">
+        <span class="viewer-title">🖥️ Notebook — 3D Viewer</span>
+        <a href="index.html" class="viewer-back">← Voltar ao Portfólio</a>
+    </header>
+
+    <div id="canvas-container"></div>
+
+    <div class="viewer-controls">
+        <button class="control-btn" id="btnReset">⟳ Reset Câmera</button>
+        <button class="control-btn active" id="btnAutoRotate">⏸ Auto-Rotação</button>
+        <button class="control-btn" id="btnWireframe">◇ Wireframe</button>
+    </div>
+
+    <p class="hint">Arraste para girar · Scroll para zoom · Botão direito para mover</p>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // ── Scene
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b0b0f);
+
+        // ── Camera
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(3, 2.5, 4);
+
+        // ── Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.4;
+        container.appendChild(renderer.domElement);
+
+        // ── Controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1.5;
+        controls.minDistance = 1;
+        controls.maxDistance = 20;
+
+        // ── Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+        dirLight.position.set(5, 8, 5);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        const fillLight = new THREE.DirectionalLight(0xe8b84b, 0.4);
+        fillLight.position.set(-3, 2, -3);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.DirectionalLight(0x4488ff, 0.5);
+        rimLight.position.set(0, 3, -5);
+        scene.add(rimLight);
+
+        // ── Ground
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(20, 20),
+            new THREE.MeshStandardMaterial({ color: 0x0d0d12, roughness: 0.9 })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.01;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        const grid = new THREE.GridHelper(10, 20, 0x1a1a2e, 0x1a1a2e);
+        grid.material.opacity = 0.25;
+        grid.material.transparent = true;
+        scene.add(grid);
+
+        // ── Load Model
+        let model = null;
+        const loadingText = document.getElementById('loadingText');
+
+        const loader = new GLTFLoader();
+        loader.load(
+            'assets/models/notebook.glb',
+            function onLoad(gltf) {
+                model = gltf.scene;
+
+                // Scale & center
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+                const scale = 2.5 / Math.max(size.x, size.y, size.z);
+
+                model.scale.setScalar(scale);
+                model.position.sub(center.multiplyScalar(scale));
+
+                // Sit on ground
+                const box2 = new THREE.Box3().setFromObject(model);
+                model.position.y -= box2.min.y;
+
+                // Shadows
+                model.traverse(function(child) {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                scene.add(model);
+
+                // Hide loading
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                console.log('Model loaded successfully');
+            },
+            function onProgress(xhr) {
+                var loaded = (xhr.loaded / 1024 / 1024).toFixed(1);
+                var total = xhr.total > 0 ? (xhr.total / 1024 / 1024).toFixed(1) : '?';
+                loadingText.textContent = 'Carregando... ' + loaded + 'MB / ' + total + 'MB';
+            },
+            function onError(error) {
+                loadingText.textContent = 'Erro ao carregar: ' + error.message;
+                console.error('Load error:', error);
+            }
+        );
+
+        // ── Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ── Resize
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ── UI
+        document.getElementById('btnReset').addEventListener('click', function() {
+            camera.position.set(3, 2.5, 4);
+            controls.target.set(0, 0, 0);
+        });
+
+        var btnAR = document.getElementById('btnAutoRotate');
+        btnAR.addEventListener('click', function() {
+            controls.autoRotate = !controls.autoRotate;
+            btnAR.textContent = controls.autoRotate ? '⏸ Auto-Rotação' : '▶ Auto-Rotação';
+            btnAR.classList.toggle('active', controls.autoRotate);
+        });
+
+        document.getElementById('btnWireframe').addEventListener('click', function() {
+            scene.traverse(function(c) {
+                if (c.isMesh && c !== ground) c.material.wireframe = !c.material.wireframe;
+            });
+        });
+    </script>
+</body>
+</html>
