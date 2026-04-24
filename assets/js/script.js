@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initStatCounters();
     initProjectModal();
     initCertModal();
+    initActivitiesModal();
     initTypingAnimation();
     initActiveNavSpy();
 });
@@ -176,6 +177,52 @@ function initProjectModal() {
 }
 
 /* ═══════════════════════════════════════
+   ACTIVITIES MODAL — Role activities
+   ═══════════════════════════════════════ */
+function initActivitiesModal() {
+    const buttons = document.querySelectorAll('.btn-activities');
+    const modal = document.getElementById('activitiesModal');
+    if (!buttons.length || !modal) return;
+
+    const titleEl = document.getElementById('activitiesTitle');
+    const companyEl = document.getElementById('activitiesCompany');
+    const contentEl = document.getElementById('activitiesContent');
+    const closeBtn = modal.querySelector('.modal-close');
+
+    function open(title, company, contentHTML) {
+        titleEl.textContent = title || '';
+        companyEl.textContent = company || '';
+        const trimmed = (contentHTML || '').replace(/<!--[\s\S]*?-->/g, '').trim();
+        contentEl.innerHTML = trimmed || '<p class="activities-empty">Atividades deste cargo serão adicionadas em breve.</p>';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const card = btn.closest('.current-card, .timeline-item');
+            if (!card) return;
+            const title = card.querySelector('h3')?.textContent?.trim() || '';
+            const company = card.querySelector('h4')?.textContent?.trim() || '';
+            const activities = card.querySelector('.role-activities');
+            open(title, company, activities ? activities.innerHTML : '');
+        });
+    });
+
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) close();
+    });
+}
+
+/* ═══════════════════════════════════════
    CERT MODAL — Certificate preview
    ═══════════════════════════════════════ */
 function initCertModal() {
@@ -186,15 +233,25 @@ function initCertModal() {
     const imgWrap = modal.querySelector('.cert-modal-img');
     const img = document.getElementById('certImg');
     const title = document.getElementById('certTitle');
+    const verifyLink = document.getElementById('certVerifyLink');
     const closeBtn = modal.querySelector('.modal-close');
 
-    function open(src, label) {
+    function open(src, label, verifyUrl) {
         title.textContent = label || '';
         imgWrap.classList.remove('empty');
         img.onload = function() { imgWrap.classList.remove('empty'); };
         img.onerror = function() { imgWrap.classList.add('empty'); };
         img.src = src || '';
         img.alt = label || '';
+        if (verifyLink) {
+            if (verifyUrl) {
+                verifyLink.href = verifyUrl;
+                verifyLink.hidden = false;
+            } else {
+                verifyLink.hidden = true;
+                verifyLink.href = '#';
+            }
+        }
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -210,7 +267,7 @@ function initCertModal() {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            open(btn.dataset.cert, btn.dataset.title);
+            open(btn.dataset.cert, btn.dataset.title, btn.dataset.certUrl);
         });
     });
 
