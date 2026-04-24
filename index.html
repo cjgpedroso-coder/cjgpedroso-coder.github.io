@@ -1,817 +1,639 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caio Pedroso — Portfólio 3D</title>
+    <title>Caio Pedroso — BI Analyst &amp; Business Automation</title>
+    <meta name="description"
+        content="Portfólio de Caio Pedroso — BI Analyst, Business Automation e Python Developer. Dados que guiam decisões, automação que libera tempo.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0b0b0f; color: #e8e8e8; font-family: 'Inter', system-ui, sans-serif; overflow: hidden; height: 100vh; }
-        #canvas3d { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 0; }
-
-        .hero-text-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 2; pointer-events: none; opacity: 1; transition: opacity 1.5s ease;
-        }
-        .hero-text-overlay.fade-out { opacity: 0; }
-
-        .hero-welcome {
-            font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; text-align: center;
-            line-height: 1.2; max-width: 700px; padding: 0 20px;
-            background: linear-gradient(135deg, #ffffff 0%, #e8b84b 50%, #d4a03a 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            transform: translateY(0); transition: transform 1.5s ease, opacity 1.5s ease;
-        }
-        .hero-text-overlay.fade-out .hero-welcome { transform: translateY(-30px); }
-
-        .hero-subtitle-3d {
-            font-size: clamp(0.75rem, 1.3vw, 0.9rem); font-weight: 400;
-            color: rgba(255,255,255,0.4); margin-top: 16px; letter-spacing: 3px; text-transform: uppercase;
-        }
-
-        .btn-next {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 10px;
-            cursor: pointer; background: none; border: none; outline: none; transition: opacity 0.5s ease, transform 0.3s ease;
-        }
-        .btn-next:hover { transform: translateX(-50%) scale(1.05); }
-        .btn-next.hidden { opacity: 0; pointer-events: none; }
-        .btn-next-label { font-size: 0.7rem; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; font-family: 'Inter', sans-serif; }
-        .btn-next-circle {
-            width: 50px; height: 50px; border-radius: 50%;
-            border: 2px solid rgba(232, 184, 75, 0.4);
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(232, 184, 75, 0.05); transition: all 0.3s ease;
-            animation: pulse 2.5s ease-in-out infinite;
-        }
-        .btn-next:hover .btn-next-circle { border-color: #e8b84b; background: rgba(232,184,75,0.15); box-shadow: 0 0 20px rgba(232,184,75,0.2); }
-        .btn-next-arrow {
-            width: 12px; height: 12px;
-            border-right: 2px solid rgba(232, 184, 75, 0.7); border-bottom: 2px solid rgba(232, 184, 75, 0.7);
-            transform: rotate(45deg) translate(-2px, -2px); transition: border-color 0.3s ease;
-        }
-        .btn-next:hover .btn-next-arrow { border-color: #e8b84b; }
-        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(232,184,75,0.1); } 50% { box-shadow: 0 0 0 12px rgba(232,184,75,0); } }
-
-        .step-dots {
-            position: fixed; right: 24px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 12px; z-index: 10;
-            transition: opacity 0.5s ease;
-        }
-        .step-dots.hidden { opacity: 0; pointer-events: none; }
-        .step-dot {
-            width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.15);
-            transition: all 0.5s ease; cursor: pointer; border: none;
-        }
-        .step-dot.active { background: #e8b84b; box-shadow: 0 0 8px rgba(232,184,75,0.5); transform: scale(1.3); }
-
-        /* ── Floating iframe (portfolio) ── */
-        .portfolio-frame-wrapper {
-            position: fixed;
-            z-index: 20;
-            border-radius: 12px;
-            overflow: visible;
-            opacity: 0;
-            pointer-events: none;
-            transition: none;
-        }
-
-        /* Futuristic glowing border */
-        .portfolio-frame-wrapper::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 14px;
-            background: conic-gradient(
-                from var(--border-angle, 0deg),
-                #e8b84b,
-                #d4a03a,
-                #44d4ff,
-                #4488ff,
-                #e8b84b
-            );
-            z-index: -1;
-            animation: rotateBorder 4s linear infinite;
-        }
-
-        .portfolio-frame-wrapper::after {
-            content: '';
-            position: absolute;
-            inset: 1px;
-            border-radius: 12px;
-            background: #0b0b0f;
-            z-index: -1;
-        }
-
-        @property --border-angle {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: false;
-        }
-
-        @keyframes rotateBorder {
-            to { --border-angle: 360deg; }
-        }
-
-        .portfolio-frame-wrapper .frame-glow {
-            position: absolute;
-            inset: -20px;
-            border-radius: 24px;
-            background: transparent;
-            box-shadow:
-                0 0 30px rgba(232, 184, 75, 0.15),
-                0 0 60px rgba(68, 212, 255, 0.08),
-                0 20px 80px rgba(0, 0, 0, 0.6);
-            z-index: -2;
-            pointer-events: none;
-        }
-
-        .portfolio-frame-wrapper .frame-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 11px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .portfolio-frame-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #0b0b0f;
-            display: block;
-        }
-
-        /* Floating action buttons */
-        .frame-actions {
-            position: fixed;
-            top: 16px; right: 16px;
-            z-index: 30;
-            display: flex;
-            gap: 8px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-        .frame-actions.visible { opacity: 1; pointer-events: all; }
-
-        .frame-btn {
-            padding: 8px 14px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: #e8b84b;
-            background: rgba(11,11,15,0.92);
-            border: 1px solid rgba(232,184,75,0.3);
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(8px);
-        }
-        .frame-btn:hover { background: rgba(232,184,75,0.15); border-color: #e8b84b; }
-        .frame-btn.hidden { display: none; }
-
-        /* Workspace button (visible in free-orbit mode) */
-        .btn-workspace {
-            position: fixed;
-            bottom: 40px; left: 50%; transform: translateX(-50%);
-            z-index: 10;
-            padding: 12px 28px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #e8b84b;
-            background: rgba(11,11,15,0.92);
-            border: 1px solid rgba(232,184,75,0.4);
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 1px;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.5s ease;
-            backdrop-filter: blur(8px);
-        }
-        .btn-workspace.visible { opacity: 1; pointer-events: all; }
-        .btn-workspace:hover { background: rgba(232,184,75,0.15); border-color: #e8b84b; box-shadow: 0 0 20px rgba(232,184,75,0.2); }
-        .orbit-hint {
-            position: fixed;
-            bottom: 90px; left: 50%; transform: translateX(-50%);
-            z-index: 10;
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.3);
-            letter-spacing: 1px;
-            font-family: 'Inter', sans-serif;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-        .orbit-hint.visible { opacity: 1; }
-
-        /* Fullscreen state */
-        .portfolio-frame-wrapper.fullscreen {
-            border-radius: 0 !important;
-        }
-        .portfolio-frame-wrapper.fullscreen::before,
-        .portfolio-frame-wrapper.fullscreen::after,
-        .portfolio-frame-wrapper.fullscreen .frame-glow {
-            display: none;
-        }
-        .portfolio-frame-wrapper.fullscreen .frame-inner {
-            border-radius: 0;
-        }
-
-        .loading-overlay {
-            position: fixed; inset: 0; background: #0b0b0f;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 16px; z-index: 1000; transition: opacity 0.8s ease;
-        }
-        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
-        .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(232,184,75,0.2); border-top-color: #e8b84b; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        .loading-text { font-size: 0.85rem; color: #888; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── Mobile responsive ── */
-        @media (max-width: 768px) {
-            .hero-welcome {
-                font-size: clamp(1.4rem, 7vw, 2.2rem);
-                padding: 0 16px;
-            }
-            .hero-subtitle-3d {
-                font-size: 0.6rem;
-                letter-spacing: 1.5px;
-            }
-            .btn-next { bottom: 24px; }
-            .btn-next-label { font-size: 0.6rem; }
-            .btn-next-circle { width: 42px; height: 42px; }
-            .btn-next-arrow { width: 10px; height: 10px; }
-            .step-dots { right: 12px; gap: 8px; }
-            .step-dot { width: 6px; height: 6px; }
-            .frame-actions { top: 10px; right: 10px; gap: 6px; }
-            .frame-btn { padding: 10px 14px; font-size: 0.7rem; border-radius: 8px; }
-            .portfolio-frame-wrapper::before { inset: -2px; border-radius: 10px; }
-            .portfolio-frame-wrapper .frame-inner { border-radius: 8px; }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=28">
 </head>
+
 <body>
 
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <span class="loading-text" id="loadingText">Carregando modelo 3D...</span>
-    </div>
+    <!-- ═══════════════════ TOP NAV ═══════════════════ -->
+    <header class="topnav" id="topnav">
+        <nav class="topnav-links" id="topnavLinks">
+            <a href="#sobre" class="topnav-link">Sobre</a>
+            <a href="#formacao" class="topnav-link">Formação</a>
+            <a href="#experiencia" class="topnav-link">Experiência</a>
+            <a href="#stack" class="topnav-link">Stack</a>
+            <a href="#projetos" class="topnav-link">Projetos</a>
+        </nav>
+        <a href="#contato" class="topnav-cta">
+            <span>Fale comigo</span>
+            <i class="fas fa-arrow-right"></i>
+        </a>
+        <button class="topnav-burger" id="topnavBurger" aria-label="Abrir menu">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
 
-    <canvas id="canvas3d"></canvas>
+    <!-- ═══════════════════ HERO ═══════════════════ -->
+    <section class="hero" id="top">
+        <div class="hero-grid-bg"></div>
+        <div class="hero-inner">
+            <p class="hero-tagline">
+                &ldquo;Dados que orientam<br>
+                decisões, <em>automação que<br>
+                devolve seu tempo</em>.&rdquo;
+            </p>
+            <h1 class="hero-wordmark">
+                <span class="hero-wordmark-line hero-wordmark-first">CAIO</span>
+                <span class="hero-wordmark-line hero-wordmark-accent">PEDROSO</span>
+            </h1>
+        </div>
+        <div class="hero-photo">
+            <div class="hero-photo-glow"></div>
+            <img src="assets/img/hero-img-0150.png" alt="Caio Pedroso">
+        </div>
+    </section>
 
-    <div class="hero-text-overlay" id="heroText">
-        <h1 class="hero-welcome">Bem-vindo ao meu<br>Espaço Profissional!</h1>
-        <p class="hero-subtitle-3d">Caio Pedroso — BI Analyst | Business Automation</p>
-    </div>
+    <!-- ═══════════════════ SOBRE ═══════════════════ -->
+    <section class="section" id="sobre">
+        <div class="section-container">
+            <h2 class="section-title" data-aos>
+                Olá,<br>
+                <em>tudo bem?</em>
+            </h2>
+            <div class="about-intro about-intro-full" data-aos>
+                <p class="lead">
+                    Se você chegou até aqui, imagino que queira conhecer um pouco mais sobre quem
+                    está por trás deste trabalho, então vou me apresentar de forma simples e direta.
+                </p>
+                <p>
+                    Meu nome é <strong>Caio Pedroso</strong>, nasci em 1994 e atualmente moro em
+                    Louveira, no interior de São Paulo. Ao longo de mais de
+                    <span class="yellow-highlight">15 anos de experiência profissional</span>,
+                    venho construindo minha trajetória nas áreas fiscal, financeira e de tecnologia,
+                    sempre com um objetivo claro: transformar dados em decisões mais inteligentes e eficientes.
+                </p>
+                <p>
+                    Hoje atuo como <strong>Supervisor de Operações</strong> na Green Village Mobile
+                    Homes e também como <strong>Analista de Dados e Responsável Fiscal</strong> na
+                    Romica Brasil. Meu dia a dia envolve análise de dados, otimização de processos
+                    e apoio direto na tomada de decisões estratégicas.
+                </p>
+                <p>
+                    Tenho experiência com Excel avançado, Power BI, SQL (MySQL e Oracle), Python e
+                    automação de processos com uso de inteligência artificial. Mas, mais do que as
+                    ferramentas, o que realmente guia meu trabalho é a capacidade de enxergar
+                    oportunidades de melhoria e transformar rotinas complexas em soluções mais
+                    simples e eficazes.
+                </p>
+                <p>
+                    Sou movido por desafios e por aquela pergunta constante:
+                    <em>como isso pode ser feito de forma melhor?</em> É isso que me impulsiona a
+                    evoluir continuamente e gerar valor por onde passo.
+                </p>
+                <p>
+                    Se quiser conversar ou entender melhor como posso contribuir,
+                    <strong>fico à disposição</strong>.
+                </p>
+            </div>
 
-    <div class="step-dots" id="stepDots">
-        <button class="step-dot active" data-step="0"></button>
-        <button class="step-dot" data-step="1"></button>
-    </div>
+        </div>
+    </section>
 
-    <button class="btn-next" id="btnNext">
-        <span class="btn-next-label">Próximo</span>
-        <div class="btn-next-circle"><div class="btn-next-arrow"></div></div>
-    </button>
+    <!-- ═══════════════════ FORMAÇÃO ═══════════════════ -->
+    <section class="section section-alt" id="formacao">
+        <div class="section-container">
+            <h2 class="section-title" data-aos>
+                Base sólida<br>
+                <em>em constante</em> evolução
+            </h2>
 
-    <!-- Portfolio iframe (hidden until step 2) -->
-    <div class="portfolio-frame-wrapper" id="portfolioWrapper">
-        <div class="frame-glow"></div>
-        <div class="frame-inner">
-            <iframe src="portfolio.html" id="portfolioFrame"></iframe>
+            <div class="edu-grid">
+                <article class="edu-card" data-aos>
+                    <div class="edu-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="edu-year">2014 — 2018</div>
+                    <h3>Bacharelado em Engenharia Civil</h3>
+                    <p>Centro Universitário Padre Anchieta — Jundiaí</p>
+                    <button class="btn-cert" data-cert="assets/certs/bacharelado-engenharia-civil.jpg" data-title="Bacharelado em Engenharia Civil">
+                        <i class="fas fa-certificate"></i> Certificado
+                    </button>
+                </article>
+                <article class="edu-card" data-aos>
+                    <div class="edu-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="edu-year">2011 — 2013</div>
+                    <h3>Técnico em Publicidade e Propaganda</h3>
+                    <p>Escola Professor Luís Rosa — Jundiaí</p>
+                </article>
+                <article class="edu-card" data-aos>
+                    <div class="edu-icon"><i class="fas fa-language"></i></div>
+                    <div class="edu-year">2016 — 2018</div>
+                    <h3>Executive English Course</h3>
+                    <p>Wise Up — Jundiaí</p>
+                    <button class="btn-cert" data-cert="assets/certs/wiseup-english.jpg" data-title="Executive English Course — Wise Up">
+                        <i class="fas fa-certificate"></i> Certificado
+                    </button>
+                </article>
+                <article class="edu-card" data-aos>
+                    <div class="edu-icon"><i class="fas fa-language"></i></div>
+                    <div class="edu-year">2018</div>
+                    <h3>Certificate EC English Language</h3>
+                    <p>EC English Holdings — Toronto, Canadá</p>
+                    <button class="btn-cert" data-cert="assets/certs/ec-english-toronto.jpg" data-title="Certificate EC English Language — Toronto">
+                        <i class="fas fa-certificate"></i> Certificado
+                    </button>
+                </article>
+            </div>
+
+            <div class="certs-card" data-aos>
+                <h3 class="certs-title"><i class="fas fa-award"></i> Certificações</h3>
+                <div class="certs-grid">
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Analisando Dados com Pandas e SQL — <em>Asimov Academy</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/asimov-pandas-sql.jpg" data-title="Analisando Dados com Pandas e SQL — Asimov Academy">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Python Starter — <em>Asimov Academy</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/asimov-python-starter.jpg" data-title="Python Starter — Asimov Academy">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Power BI Desktop — <em>Alura</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/alura-power-bi.jpg" data-title="Power BI Desktop — Alura">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Oracle Database — <em>Alura</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/alura-oracle-db.jpg" data-title="Oracle Database — Alura">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> SQL com Oracle Database — <em>Alura</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/alura-sql-oracle.jpg" data-title="SQL com Oracle Database — Alura">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Comandos DML e Consultas SQL — <em>Alura</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/alura-dml-sql.jpg" data-title="Comandos DML e Consultas SQL — Alura">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Lógica de Programação e JavaScript — <em>Alura</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/alura-logica-js.jpg" data-title="Lógica de Programação e JavaScript — Alura">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Modelagem de Banco de Dados Relacional — <em>Alura</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/alura-modelagem-bd.jpg" data-title="Modelagem de Banco de Dados Relacional — Alura">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Procedures SQL e SQL com MySQL — <em>Alura</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/alura-procedures-mysql.jpg" data-title="Procedures SQL e SQL com MySQL — Alura">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                    <div class="cert-item">
+                        <span class="cert-label"><i class="fas fa-check"></i> Excel Avançado — <em>Alura</em></span>
+                        <button class="btn-cert btn-cert-mini" data-cert="assets/certs/alura-excel-avancado.jpg" data-title="Excel Avançado — Alura">
+                            <i class="fas fa-certificate"></i> Certificado
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ EXPERIÊNCIA ═══════════════════ -->
+    <section class="section" id="experiencia">
+        <div class="section-container">
+            <h2 class="section-title" data-aos>
+                Trajetória<br>
+                <em>construída com</em> rigor
+            </h2>
+
+            <div class="current-row">
+                <article class="current-card" data-aos>
+                    <div class="current-badge">Atual</div>
+                    <div class="current-period"><i class="fas fa-calendar-alt"></i> Set/2025 — Atual</div>
+                    <h3>Supervisor de Operações Brasil</h3>
+                    <h4>Green Village Mobile Homes</h4>
+                    <p>Supervisão das operações no Brasil, coordenando equipes e garantindo a eficiência dos processos digitais e operacionais.</p>
+                    <div class="role-tags">
+                        <span class="tag">Operações</span><span class="tag">Supervisão</span><span class="tag">Automação</span><span class="tag">T.I.</span>
+                    </div>
+                </article>
+                <article class="current-card" data-aos>
+                    <div class="current-badge">Atual</div>
+                    <div class="current-period"><i class="fas fa-calendar-alt"></i> Jan/2021 — Atual</div>
+                    <h3>Analista de Dados / Responsável Fiscal</h3>
+                    <h4>Romica Brasil</h4>
+                    <p>Análise de dados e gestão fiscal, combinando expertise analítica com conhecimento tributário para otimização de processos.</p>
+                    <div class="role-tags">
+                        <span class="tag">Análise de Dados</span><span class="tag">Fiscal</span><span class="tag">Python</span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="timeline-layout">
+            <div class="timeline">
+                <div class="timeline-item" data-aos>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-period">Jan/2021 — Atual</div>
+                    <div class="timeline-content">
+                        <h3>Analista de Dados</h3>
+                        <h4>Romica Brasil</h4>
+                        <p>Dashboards em Power BI, análise com SQL e Python, modelagem no Firebase.</p>
+                        <div class="role-tags"><span class="tag">Power BI</span><span class="tag">Python</span><span class="tag">SQL</span><span class="tag">Firebase</span></div>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-period">Jan/2014 — Jan/2021</div>
+                    <div class="timeline-content">
+                        <h3>Responsável Fiscal</h3>
+                        <h4>Romica Brasil</h4>
+                        <p>Gestão completa do departamento fiscal, liderando equipe de 5 colaboradores.</p>
+                        <div class="role-tags"><span class="tag">Gestão Fiscal</span><span class="tag">Liderança</span><span class="tag">Compliance</span></div>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-period">Jan/2012 — Jan/2014</div>
+                    <div class="timeline-content">
+                        <h3>Escriturário Fiscal Pleno</h3>
+                        <h4>Romica Brasil</h4>
+                        <p>Escrituração fiscal, fechamento contábil e relatórios para gestão.</p>
+                        <div class="role-tags"><span class="tag">Escrituração</span><span class="tag">Contabilidade</span></div>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-period">Jan/2011 — Jan/2012</div>
+                    <div class="timeline-content">
+                        <h3>Escriturário Fiscal Júnior</h3>
+                        <h4>Romica Brasil</h4>
+                        <p>Lançamento de notas fiscais, apuração de impostos e obrigações acessórias.</p>
+                        <div class="role-tags"><span class="tag">Notas Fiscais</span><span class="tag">Impostos</span></div>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-period">Jan/2010 — Jan/2011</div>
+                    <div class="timeline-content">
+                        <h3>Estagiário em Tecnologia</h3>
+                        <h4>Romica Brasil</h4>
+                        <p>Suporte em sistemas internos, infraestrutura de T.I. e projetos de melhoria contínua.</p>
+                        <div class="role-tags"><span class="tag">Suporte T.I.</span><span class="tag">Infraestrutura</span></div>
+                    </div>
+                </div>
+            </div>
+            <aside class="timeline-aside" data-aos>
+                <img src="assets/img/timeline-img.png" alt="Caio Pedroso" class="timeline-photo">
+            </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ STACK ═══════════════════ -->
+    <section class="section section-alt" id="stack">
+        <div class="section-container">
+            <h2 class="section-title" data-aos>
+                Ferramentas que<br>
+                <em>uso todos os dias</em>
+            </h2>
+
+            <div class="pillar-grid">
+                <div class="pillar-card" data-aos>
+                    <div class="pillar-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="pillar-title">Análise &amp; BI</h3>
+                    <p class="pillar-desc">
+                        Dashboards em Power BI, queries complexas em SQL, modelagem de dados e relatórios
+                        que orientam decisões estratégicas.
+                    </p>
+                    <div class="pillar-tags">
+                        <span>Power BI</span><span>SQL</span><span>Pandas</span>
+                    </div>
+                </div>
+                <div class="pillar-card pillar-card-featured" data-aos>
+                    <div class="pillar-icon"><i class="fas fa-robot"></i></div>
+                    <h3 class="pillar-title">Automação &amp; IA</h3>
+                    <p class="pillar-desc">
+                        Fluxos automatizados, web scraping, integrações com agentes de IA para
+                        padronização, análise e execução de tarefas recorrentes.
+                    </p>
+                    <div class="pillar-tags">
+                        <span>Claude</span><span>OpenAI</span><span>Python</span>
+                    </div>
+                </div>
+                <div class="pillar-card" data-aos>
+                    <div class="pillar-icon"><i class="fas fa-code"></i></div>
+                    <h3 class="pillar-title">Desenvolvimento</h3>
+                    <p class="pillar-desc">
+                        Aplicações web full-stack em Next.js/React com banco de dados, autenticação,
+                        APIs e painéis administrativos sob medida.
+                    </p>
+                    <div class="pillar-tags">
+                        <span>Next.js</span><span>React</span><span>PostgreSQL</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stack-grid">
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Excel Avançado</span><span class="stack-pct">100%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="100"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>SQL · MySQL · Oracle</span><span class="stack-pct">90%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="90"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Python</span><span class="stack-pct">85%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="85"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Pandas</span><span class="stack-pct">85%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="85"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Power BI</span><span class="stack-pct">60%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="60"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Claude</span><span class="stack-pct">100%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="100"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>OpenAI</span><span class="stack-pct">100%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="100"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Google AI Studio</span><span class="stack-pct">90%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="90"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>DevOps</span><span class="stack-pct">60%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="60"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Rotinas Administrativas</span><span class="stack-pct">100%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="100"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Rotinas Fiscais</span><span class="stack-pct">100%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="100"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Rotinas de R.H.</span><span class="stack-pct">70%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="70"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Rotinas Financeiras</span><span class="stack-pct">100%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="100"></div></div>
+                </div>
+                <div class="stack-item" data-aos>
+                    <div class="stack-head"><span>Gestão de Equipe</span><span class="stack-pct">90%</span></div>
+                    <div class="stack-bar"><div class="stack-fill" data-width="90"></div></div>
+                </div>
+            </div>
+
+            <!-- Languages -->
+            <div class="lang-row">
+                <h3 class="lang-heading">Idiomas</h3>
+                <div class="lang-items">
+                    <div class="lang-chip"><span class="lang-pct">100%</span><span>Português</span></div>
+                    <div class="lang-chip"><span class="lang-pct">70%</span><span>Inglês</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ PROJETOS ═══════════════════ -->
+    <section class="section" id="projetos">
+        <div class="section-container">
+            <h2 class="section-title" data-aos>
+                Soluções reais<br>
+                <em>para problemas reais</em>
+            </h2>
+
+            <div class="projects-grid">
+                <article class="project-card project-featured" data-aos>
+                    <div class="project-badge"><i class="fas fa-star"></i> Destaque</div>
+                    <div class="project-img">
+                        <img src="assets/img/greengo-app.png" alt="Gestão Financeira Inteligente">
+                        <div class="project-overlay"><span class="project-view"><i class="fas fa-expand"></i></span></div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags">
+                            <span class="tag">Next.js</span><span class="tag">PostgreSQL</span><span class="tag">IA</span><span class="tag">WhatsApp</span>
+                        </div>
+                        <h3 class="project-title">Gestão Financeira Inteligente</h3>
+                        <p class="project-desc">Aplicação completa de gestão financeira pessoal com controle de investimentos em renda variável e fixa, múltiplas contas bancárias, cartões de crédito, metas de economia e relatórios detalhados. Integração com agente de IA via WhatsApp para lançamentos, edição e geração de relatórios automatizados.</p>
+                        <a href="https://app.ggreengo.com" target="_blank" class="project-link">
+                            <span>Acessar projeto</span>
+                            <i class="fas fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="project-card" data-aos>
+                    <div class="project-img">
+                        <img src="assets/img/gfp.png" alt="Gestão Financeira Pessoal">
+                        <div class="project-overlay"><span class="project-view"><i class="fas fa-expand"></i></span></div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags"><span class="tag">Excel</span><span class="tag">VBA</span><span class="tag">Macros</span></div>
+                        <h3 class="project-title">Gestão Financeira Pessoal</h3>
+                        <p class="project-desc">Planilha completa para gestão financeira pessoal com lançamentos dinâmicos, macros, login com senha, banco de dados oculto, múltiplos cartões, investimentos, aposentadoria e relatórios detalhados.</p>
+                    </div>
+                </article>
+
+                <article class="project-card" data-aos>
+                    <div class="project-img">
+                        <img src="assets/img/planilha-empresa.png" alt="Gestão Empresarial">
+                        <div class="project-overlay"><span class="project-view"><i class="fas fa-expand"></i></span></div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags"><span class="tag">Excel</span><span class="tag">VBA</span><span class="tag">Análise</span></div>
+                        <h3 class="project-title">Gestão Empresarial</h3>
+                        <p class="project-desc">Planilha versátil para gestão empresarial de qualquer segmento, com cálculos, análises e relatórios complexos para apoiar o empresário no dia a dia.</p>
+                    </div>
+                </article>
+
+                <article class="project-card project-featured" data-aos>
+                    <div class="project-badge"><i class="fas fa-star"></i> Destaque</div>
+                    <div class="project-img">
+                        <img src="assets/img/gestão-nextjs.png" alt="Gestão Empresarial Complexa">
+                        <div class="project-overlay"><span class="project-view"><i class="fas fa-expand"></i></span></div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags">
+                            <span class="tag">React</span><span class="tag">Tailwind</span><span class="tag">SQLite</span><span class="tag">API</span>
+                        </div>
+                        <h3 class="project-title">Gestão Empresarial Complexa</h3>
+                        <p class="project-desc">App web completa para gestão empresarial: login com múltiplos níveis, ponto digital, módulo Vendas com 3+ mil anúncios via API, módulo Logístico, RH com folha automática, Financeiro com fluxo de caixa, CEO, T.I. e Desenvolvedor.</p>
+                    </div>
+                </article>
+
+                <article class="project-card" data-aos>
+                    <div class="project-img">
+                        <img src="assets/img/automation-activity.png" alt="Automação de Tarefas">
+                        <div class="project-overlay"><span class="project-view"><i class="fas fa-expand"></i></span></div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags"><span class="tag">Next.js</span><span class="tag">Prisma</span><span class="tag">API</span></div>
+                        <h3 class="project-title">Automação de Tarefas</h3>
+                        <p class="project-desc">Aplicação interna para modernizar tarefas empresariais: formação de preço, controle de estoque, geração de rotas logísticas e romaneios diários.</p>
+                    </div>
+                </article>
+
+                <article class="project-card" data-aos>
+                    <div class="project-img">
+                        <img src="assets/img/webscraper-project.png" alt="Web Scraping Inteligente">
+                        <div class="project-overlay"><span class="project-view"><i class="fas fa-expand"></i></span></div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags">
+                            <span class="tag">Python</span><span class="tag">Next.js</span><span class="tag">IA</span><span class="tag">PostgreSQL</span>
+                        </div>
+                        <h3 class="project-title">Web Scraping Inteligente</h3>
+                        <p class="project-desc">Sistema automatizado para coleta de anúncios de fornecedores. IA padroniza, traduz, organiza e calcula preços finais, persistindo direto em PostgreSQL.</p>
+                    </div>
+                </article>
+            </div>
+
+            <h3 class="projects-subheading" data-aos>Projetos com Participação Ativa ou Liderança</h3>
+
+            <div class="projects-grid">
+                <article class="project-card" data-aos>
+                    <div class="project-img">
+                        <img src="assets/img/greenvillage-site.png" alt="Green Village Mobile Homes">
+                        <div class="project-overlay"><span class="project-view"><i class="fas fa-expand"></i></span></div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags">
+                            <span class="tag">Next.js</span><span class="tag">Frontend</span><span class="tag">Liderança</span>
+                        </div>
+                        <h3 class="project-title">Green Village Mobile Homes</h3>
+                        <p class="project-desc">Site institucional de empresa portuguesa especializada em casas móveis. Liderança de equipe e coordenação de frontend/backend para uma plataforma moderna e otimizada para conversão.</p>
+                        <a href="https://greenvillagemobilehomes.com" target="_blank" class="project-link">
+                            <span>Visitar site</span>
+                            <i class="fas fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="project-card" data-aos>
+                    <div class="project-img">
+                        <img src="assets/img/gv-wix-site.png" alt="Green Village — Wix">
+                        <div class="project-overlay"><span class="project-view"><i class="fas fa-expand"></i></span></div>
+                    </div>
+                    <div class="project-body">
+                        <div class="project-tags">
+                            <span class="tag">Wix</span><span class="tag">Gestão</span><span class="tag">T.I.</span>
+                        </div>
+                        <h3 class="project-title">Manutenção Site Wix</h3>
+                        <p class="project-desc">Administração, manutenção e atualização contínua de site institucional em Wix. Coordenação da equipe de T.I. e garantia de performance e integridade do conteúdo digital.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ CTA BAND ═══════════════════ -->
+    <section class="cta-band" id="contato">
+        <div class="cta-container">
+            <div class="cta-kicker">
+                <span class="hero-kicker-dot"></span>
+                Vamos conversar
+            </div>
+            <h2 class="cta-title">
+                Pronto para transformar<br>
+                <em>dados em</em> resultado?
+            </h2>
+            <p class="cta-subtitle">
+                Escolha o canal mais confortável — respondo rápido.
+            </p>
+            <div class="cta-actions">
+                <a href="mailto:cjgpedroso@gmail.com" class="cta-btn cta-btn-primary">
+                    <i class="fas fa-envelope"></i>
+                    <span>cjgpedroso@gmail.com</span>
+                </a>
+                <a href="https://wa.me/5511945487575" target="_blank" class="cta-btn">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </a>
+                <a href="https://linkedin.com/in/caiojgpedroso" target="_blank" class="cta-btn">
+                    <i class="fab fa-linkedin-in"></i>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="https://github.com/cjgpedroso-coder" target="_blank" class="cta-btn">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ FOOTER ═══════════════════ -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <p>Caio Pedroso · BI Analyst &amp; Business Automation</p>
+            </div>
+            <div class="footer-links">
+                <a href="#sobre">Sobre</a>
+                <a href="#projetos">Projetos</a>
+                <a href="#experiencia">Experiência</a>
+                <a href="#contato">Contato</a>
+            </div>
+            <p class="footer-copy">&copy; 2026 Caio Pedroso. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ═══════════════════ CERT MODAL ═══════════════════ -->
+    <div class="modal-overlay cert-modal" id="certModal">
+        <div class="modal-content modal-content-cert">
+            <button class="modal-close" aria-label="Fechar"><i class="fas fa-times"></i></button>
+            <div class="cert-modal-img">
+                <img src="" alt="" id="certImg">
+                <div class="cert-modal-empty" id="certEmpty">
+                    <i class="fas fa-file-image"></i>
+                    <p>Imagem do certificado ainda não disponível.</p>
+                </div>
+            </div>
+            <div class="cert-modal-body">
+                <h3 id="certTitle"></h3>
+            </div>
         </div>
     </div>
 
-    <div class="frame-actions" id="frameActions">
-        <button class="frame-btn" id="btnBack3d">🔮 Voltar ao 3D</button>
-        <button class="frame-btn" id="btnExpand">⛶ Expandir</button>
-        <button class="frame-btn hidden" id="btnReduce">⊞ Reduzir</button>
+    <!-- ═══════════════════ PROJECT MODAL ═══════════════════ -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Fechar"><i class="fas fa-times"></i></button>
+            <div class="modal-img">
+                <img src="" alt="" id="modalImg">
+            </div>
+            <div class="modal-body">
+                <div class="project-tags" id="modalTags"></div>
+                <h3 id="modalTitle"></h3>
+                <p id="modalDesc"></p>
+            </div>
+        </div>
     </div>
 
-    <div class="orbit-hint" id="orbitHint">Arraste para girar o notebook</div>
-    <button class="btn-workspace" id="btnWorkspace">💼 Voltar ao Espaço de Trabalho</button>
-
-    <script type="importmap">
-    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
-    </script>
-
-    <script type="module">
-        import * as THREE from 'three';
-        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-        var canvas = document.getElementById('canvas3d');
-        var scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0b0b0f);
-        var camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
-        var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.5;
-
-        // OrbitControls (disabled by default, enabled after 'back to 3D')
-        var controls = new OrbitControls(camera, canvas);
-        controls.enabled = false;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.08;
-        controls.enablePan = false;
-        controls.minDistance = 1.5;
-        controls.maxDistance = 8;
-
-        // Lighting
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-        var keyLight = new THREE.DirectionalLight(0xffffff, 2);
-        keyLight.position.set(5, 8, 5); keyLight.castShadow = true; scene.add(keyLight);
-        var warmLight = new THREE.DirectionalLight(0xe8b84b, 0.5);
-        warmLight.position.set(-4, 3, -2); scene.add(warmLight);
-        var coolLight = new THREE.DirectionalLight(0x4488ff, 0.3);
-        coolLight.position.set(2, 2, -6); scene.add(coolLight);
-
-
-
-        // ── State
-        var modelCenter = new THREE.Vector3(0, 0.5, 0);
-        var currentStep = 0;
-        var isAnimating = false;
-        var isMobile = window.innerWidth < 768;
-        var camState = { angle: Math.PI, height: 0.85, radius: isMobile ? 6.5 : 4.5 };
-        var screenMesh = null;
-        var screenCorners3D = [];
-
-        // Adjust camera FOV for mobile
-        if (isMobile) {
-            camera.fov = 55;
-            camera.updateProjectionMatrix();
-        }
-
-        var steps = [
-            { angle: Math.PI, height: 0.85, radius: isMobile ? 6.5 : 4.5, duration: 0 },
-            { angle: 0, height: 0.85, radius: isMobile ? 5 : 3.5, duration: 3500 },
-            { angle: -0.15, height: 0.9, radius: isMobile ? 3.5 : 2.2, duration: 2500 },
-        ];
-
-        function updateCameraFromState() {
-            camera.position.x = modelCenter.x + Math.sin(camState.angle) * camState.radius;
-            camera.position.z = modelCenter.z + Math.cos(camState.angle) * camState.radius;
-            camera.position.y = camState.height;
-            camera.lookAt(modelCenter);
-        }
-        updateCameraFromState();
-
-        // ── Screen texture
-        var screenTexture = null;
-        var textureLoader = new THREE.TextureLoader();
-        textureLoader.load('assets/img/screen-content.png', function(tex) {
-            tex.colorSpace = THREE.SRGBColorSpace;
-            tex.minFilter = THREE.LinearFilter;
-            tex.magFilter = THREE.LinearFilter;
-            screenTexture = tex;
-        });
-
-        // ── Load Model
-        var loader = new GLTFLoader();
-        loader.load('assets/models/notebook.glb?v=' + Date.now(), function(gltf) {
-            var model = gltf.scene;
-
-            var box = new THREE.Box3().setFromObject(model);
-            var center = box.getCenter(new THREE.Vector3());
-            var size = box.getSize(new THREE.Vector3());
-            var scale = 2.5 / Math.max(size.x, size.y, size.z);
-            model.scale.setScalar(scale);
-            model.position.sub(center.multiplyScalar(scale));
-            var box2 = new THREE.Box3().setFromObject(model);
-            model.position.y -= box2.min.y;
-
-            // Push the notebook DOWN on screen
-            model.position.y -= 0.8;
-
-            var box3 = new THREE.Box3().setFromObject(model);
-            modelCenter.copy(box3.getCenter(new THREE.Vector3()));
-
-            model.traverse(function(child) {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                    if (child.name === 'Object_2') {
-                        child.material = child.material.clone();
-                        child.material.color.set(0x000000);
-                        child.material.emissive.set(0x000000);
-                    }
-                }
-            });
-
-            scene.add(model);
-
-            // Screen plane
-            var screenRef = null;
-            model.traverse(function(child) {
-                if (child.isMesh && child.name === 'Object_2') screenRef = child;
-            });
-
-            if (screenRef) {
-                var waitTex = setInterval(function() {
-                    if (screenTexture) {
-                        addScreenPlane(screenRef, model);
-                        clearInterval(waitTex);
-                    }
-                }, 50);
-            }
-
-            // Reset camera to match actual model center height
-            console.log('Model center Y:', modelCenter.y);
-            // Set all step heights relative to model center for perfect centering
-            steps[0].height = modelCenter.y;
-            steps[1].height = modelCenter.y;
-            steps[2].height = modelCenter.y - 0.1;
-            camState.angle = steps[0].angle;
-            camState.height = steps[0].height;
-            camState.radius = steps[0].radius;
-            updateCameraFromState();
-            document.getElementById('loadingOverlay').classList.add('hidden');
-        }, function(xhr) {
-            var mb = (xhr.loaded / 1024 / 1024).toFixed(1);
-            document.getElementById('loadingText').textContent = 'Carregando... ' + mb + 'MB';
-        });
-
-        function addScreenPlane(screenRef, model) {
-            model.updateMatrixWorld(true);
-            var screenBox = new THREE.Box3().setFromObject(screenRef);
-            var screenCenter = screenBox.getCenter(new THREE.Vector3());
-            var screenSize = screenBox.getSize(new THREE.Vector3());
-
-            var screenW = screenSize.x * 1.02;
-            var screenH = screenSize.y * 1.0;
-
-            var zDepth = screenSize.z;
-            var yHeight = screenSize.y;
-            var tiltAngle = Math.atan2(zDepth, yHeight);
-
-            var planeGeo = new THREE.PlaneGeometry(screenW, screenH);
-            var planeMat = new THREE.MeshBasicMaterial({ map: screenTexture, side: THREE.FrontSide });
-
-            screenMesh = new THREE.Mesh(planeGeo, planeMat);
-            screenMesh.position.copy(screenCenter);
-            screenMesh.rotation.x = -tiltAngle;
-            screenMesh.position.z += 0.01;
-
-            scene.add(screenMesh);
-
-            // Store the 4 corners for projection to 2D
-            var hw = screenW / 2;
-            var hh = screenH / 2;
-            screenCorners3D = [
-                new THREE.Vector3(-hw, hh, 0),   // top-left
-                new THREE.Vector3(hw, hh, 0),    // top-right
-                new THREE.Vector3(hw, -hh, 0),   // bottom-right
-                new THREE.Vector3(-hw, -hh, 0),  // bottom-left
-            ];
-            // Transform to world space
-            screenCorners3D = screenCorners3D.map(function(c) {
-                return c.applyMatrix4(screenMesh.matrixWorld);
-            });
-        }
-
-        // ── Project screen mesh bounding box to 2D screen coords
-        function getScreenRect() {
-            if (!screenMesh) return null;
-
-            // Force matrix updates
-            camera.updateMatrixWorld();
-            camera.updateProjectionMatrix();
-            screenMesh.updateMatrixWorld();
-
-            var box = new THREE.Box3().setFromObject(screenMesh);
-            var corners = [
-                new THREE.Vector3(box.min.x, box.min.y, box.min.z),
-                new THREE.Vector3(box.max.x, box.min.y, box.min.z),
-                new THREE.Vector3(box.min.x, box.max.y, box.min.z),
-                new THREE.Vector3(box.max.x, box.max.y, box.min.z),
-                new THREE.Vector3(box.min.x, box.min.y, box.max.z),
-                new THREE.Vector3(box.max.x, box.min.y, box.max.z),
-                new THREE.Vector3(box.min.x, box.max.y, box.max.z),
-                new THREE.Vector3(box.max.x, box.max.y, box.max.z),
-            ];
-
-            var w = window.innerWidth;
-            var h = window.innerHeight;
-            var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-
-            corners.forEach(function(c) {
-                c.project(camera);
-                var sx = (c.x * 0.5 + 0.5) * w;
-                var sy = (-c.y * 0.5 + 0.5) * h;
-                minX = Math.min(minX, sx);
-                minY = Math.min(minY, sy);
-                maxX = Math.max(maxX, sx);
-                maxY = Math.max(maxY, sy);
-            });
-
-            return { left: minX, top: minY, width: maxX - minX, height: maxY - minY };
-        }
-
-        // ── Animate iframe from screen rect to slightly larger floating
-        var portfolioWrapper = document.getElementById('portfolioWrapper');
-        var frameActions = document.getElementById('frameActions');
-        var btnBack3d = document.getElementById('btnBack3d');
-        var btnExpand = document.getElementById('btnExpand');
-        var btnReduce = document.getElementById('btnReduce');
-        var iframeExpanded = false;
-        var isFullscreen = false;
-
-        // Store floating position for reduce
-        var floatingRect = null;
-
-        function expandPortfolio() {
-            // Force render to update matrices
-            renderer.render(scene, camera);
-
-            var rect = getScreenRect();
-            if (!rect) return;
-
-            // Start exactly at the notebook screen
-            portfolioWrapper.style.transition = 'none';
-            portfolioWrapper.style.left = rect.left + 'px';
-            portfolioWrapper.style.top = rect.top + 'px';
-            portfolioWrapper.style.width = rect.width + 'px';
-            portfolioWrapper.style.height = rect.height + 'px';
-            portfolioWrapper.style.opacity = '1';
-            portfolioWrapper.style.borderRadius = '6px';
-            portfolioWrapper.classList.remove('fullscreen');
-
-            // Force reflow
-            portfolioWrapper.offsetHeight;
-
-            // Hide the 3D screen texture
-            if (screenMesh) screenMesh.visible = false;
-
-            // Calculate target: fill more on mobile, float on desktop
-            var grow = isMobile ? 1.6 : 1.15;
-            var growH = isMobile ? 2.2 : 1.15;
-            var targetW = Math.min(rect.width * grow, window.innerWidth - 16);
-            var targetH = Math.min(rect.height * growH, window.innerHeight - 60);
-            var targetL = (window.innerWidth - targetW) / 2;
-            var targetT = (window.innerHeight - targetH) / 2;
-
-            floatingRect = { left: targetL, top: targetT, width: targetW, height: targetH };
-
-            // Animate to floating position
-            setTimeout(function() {
-                portfolioWrapper.style.transition = 'all 2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                portfolioWrapper.style.left = targetL + 'px';
-                portfolioWrapper.style.top = targetT + 'px';
-                portfolioWrapper.style.width = targetW + 'px';
-                portfolioWrapper.style.height = targetH + 'px';
-                portfolioWrapper.style.borderRadius = '12px';
-            }, 100);
-
-            // Enable interaction after animation
-            setTimeout(function() {
-                portfolioWrapper.style.pointerEvents = 'all';
-                frameActions.classList.add('visible');
-                btnExpand.classList.remove('hidden');
-                btnReduce.classList.add('hidden');
-                iframeExpanded = true;
-                isFullscreen = false;
-            }, 2200);
-        }
-
-        function goFullscreen() {
-            isFullscreen = true;
-            portfolioWrapper.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            portfolioWrapper.style.left = '0';
-            portfolioWrapper.style.top = '0';
-            portfolioWrapper.style.width = '100vw';
-            portfolioWrapper.style.height = '100vh';
-            portfolioWrapper.style.borderRadius = '0';
-            portfolioWrapper.classList.add('fullscreen');
-
-            btnExpand.classList.add('hidden');
-            btnReduce.classList.remove('hidden');
-        }
-
-        function reduceFromFullscreen() {
-            isFullscreen = false;
-            portfolioWrapper.classList.remove('fullscreen');
-
-            portfolioWrapper.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            if (floatingRect) {
-                portfolioWrapper.style.left = floatingRect.left + 'px';
-                portfolioWrapper.style.top = floatingRect.top + 'px';
-                portfolioWrapper.style.width = floatingRect.width + 'px';
-                portfolioWrapper.style.height = floatingRect.height + 'px';
-            }
-            portfolioWrapper.style.borderRadius = '12px';
-
-            btnExpand.classList.remove('hidden');
-            btnReduce.classList.add('hidden');
-        }
-
-        function collapsePortfolio() {
-            // If fullscreen, first reduce then collapse
-            if (isFullscreen) {
-                reduceFromFullscreen();
-                setTimeout(collapsePortfolio, 900);
-                return;
-            }
-
-            // Force render to update matrices
-            if (screenMesh) screenMesh.visible = true;
-            renderer.render(scene, camera);
-
-            var rect = getScreenRect();
-            if (!rect) return;
-
-            frameActions.classList.remove('visible');
-            portfolioWrapper.style.pointerEvents = 'none';
-
-            // Animate back to screen position
-            portfolioWrapper.style.transition = 'all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            portfolioWrapper.style.left = rect.left + 'px';
-            portfolioWrapper.style.top = rect.top + 'px';
-            portfolioWrapper.style.width = rect.width + 'px';
-            portfolioWrapper.style.height = rect.height + 'px';
-            portfolioWrapper.style.borderRadius = '6px';
-
-            setTimeout(function() {
-                portfolioWrapper.style.opacity = '0';
-                portfolioWrapper.style.pointerEvents = 'none';
-                iframeExpanded = false;
-
-                // Go back to step 1 position
-                currentStep = 1;
-                camState.angle = steps[1].angle;
-                camState.height = steps[1].height;
-                camState.radius = steps[1].radius;
-                updateCameraFromState();
-
-                // Enable free orbit
-                controls.enabled = true;
-                controls.target.copy(modelCenter);
-                controls.update();
-
-                // Show workspace button
-                document.getElementById('btnWorkspace').classList.add('visible');
-                document.getElementById('orbitHint').classList.add('visible');
-                setTimeout(function() {
-                    document.getElementById('orbitHint').classList.remove('visible');
-                }, 3000);
-            }, 1300);
-        }
-
-        btnBack3d.addEventListener('click', collapsePortfolio);
-        btnExpand.addEventListener('click', goFullscreen);
-        btnReduce.addEventListener('click', reduceFromFullscreen);
-
-        // Workspace button: disable orbit and re-expand portfolio
-        document.getElementById('btnWorkspace').addEventListener('click', function() {
-            controls.enabled = false;
-            document.getElementById('btnWorkspace').classList.remove('visible');
-            document.getElementById('orbitHint').classList.remove('visible');
-
-            // Animate camera back to step 2 position, then expand
-            var from = { angle: camState.angle, height: camera.position.y, radius: camera.position.distanceTo(modelCenter) };
-            var to = steps[2];
-            var duration = 2000;
-            var startTime = performance.now();
-            isAnimating = true;
-
-            function easeIO(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3) / 2; }
-
-            // Get current angle from camera position
-            var currentAngle = Math.atan2(
-                camera.position.x - modelCenter.x,
-                camera.position.z - modelCenter.z
-            );
-
-            function tickWS(now) {
-                var t = easeIO(Math.min(1, (now - startTime) / duration));
-                camState.angle = currentAngle + (to.angle - currentAngle) * t;
-                camState.height = from.height + (to.height - from.height) * t;
-                camState.radius = from.radius + (to.radius - from.radius) * t;
-                updateCameraFromState();
-                if (t < 1) {
-                    requestAnimationFrame(tickWS);
-                } else {
-                    isAnimating = false;
-                    currentStep = 2;
-                    setTimeout(expandPortfolio, 300);
-                }
-            }
-            requestAnimationFrame(tickWS);
-        });
-
-        // ── Step animation
-        function animateToStep(stepIndex) {
-            if (isAnimating || stepIndex === currentStep) return;
-            if (stepIndex < 0 || stepIndex >= steps.length) return;
-
-            var from = { angle: camState.angle, height: camState.height, radius: camState.radius };
-            var to = steps[stepIndex];
-            var duration = to.duration || 2000;
-            var startTime = performance.now();
-            isAnimating = true;
-
-            if (stepIndex > 0) {
-                document.getElementById('heroText').classList.add('fade-out');
-            } else {
-                document.getElementById('heroText').classList.remove('fade-out');
-            }
-
-            function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3) / 2; }
-
-            function tick(now) {
-                var t = easeInOutCubic(Math.min(1, (now - startTime) / duration));
-                camState.angle = from.angle + (to.angle - from.angle) * t;
-                camState.height = from.height + (to.height - from.height) * t;
-                camState.radius = from.radius + (to.radius - from.radius) * t;
-                updateCameraFromState();
-
-                if (t < 1) {
-                    requestAnimationFrame(tick);
-                } else {
-                    isAnimating = false;
-                    currentStep = stepIndex;
-                    updateUI();
-
-                    // After step 1 (rotate to front): pause then auto-chain step 2 + expand
-                    if (stepIndex === 1) {
-                        setTimeout(function() {
-                            // Zoom to screen (step 2)
-                            var from2 = { angle: camState.angle, height: camState.height, radius: camState.radius };
-                            var to2 = steps[2];
-                            var dur2 = to2.duration || 2000;
-                            var start2 = performance.now();
-                            isAnimating = true;
-
-                            function tick2(now2) {
-                                var t2 = easeInOutCubic(Math.min(1, (now2 - start2) / dur2));
-                                camState.angle = from2.angle + (to2.angle - from2.angle) * t2;
-                                camState.height = from2.height + (to2.height - from2.height) * t2;
-                                camState.radius = from2.radius + (to2.radius - from2.radius) * t2;
-                                updateCameraFromState();
-                                if (t2 < 1) {
-                                    requestAnimationFrame(tick2);
-                                } else {
-                                    isAnimating = false;
-                                    currentStep = 2;
-                                    setTimeout(expandPortfolio, 300);
-                                }
-                            }
-                            requestAnimationFrame(tick2);
-                        }, 1000); // 1s pause to show the front view
-                    }
-                }
-            }
-            requestAnimationFrame(tick);
-        }
-
-        // ── UI
-        var btnNext = document.getElementById('btnNext');
-        var dotEls = document.querySelectorAll('.step-dot');
-        var stepDotsEl = document.getElementById('stepDots');
-
-        function updateUI() {
-            dotEls.forEach(function(d, i) { d.classList.toggle('active', i <= currentStep); });
-            if (currentStep >= 1) {
-                btnNext.classList.add('hidden');
-                stepDotsEl.classList.add('hidden');
-            } else {
-                btnNext.classList.remove('hidden');
-                stepDotsEl.classList.remove('hidden');
-            }
-        }
-
-        btnNext.addEventListener('click', function() {
-            if (currentStep === 0) animateToStep(1);
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (iframeExpanded) return;
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
-                e.preventDefault();
-                if (currentStep === 0) animateToStep(1);
-            }
-        });
-
-        // ── Render
-        function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
-        animate();
-
-        window.addEventListener('resize', function() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+    <script src="assets/js/script.js?v=11"></script>
 </body>
+
 </html>

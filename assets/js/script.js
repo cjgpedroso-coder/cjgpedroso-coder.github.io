@@ -1,87 +1,51 @@
 /* ═══════════════════════════════════════════════════════
-   PORTFOLIO DASHBOARD — SCRIPTS
+   CAIO PEDROSO — PORTFOLIO SCRIPTS
    ═══════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
-    initMobileMenu();
-    initNavTabs();
+    initTopNav();
+    initBurger();
     initScrollAnimations();
-    initSidebarSkills();
-    initIASkills();
-    initHeroStats();
-    initProjectCards();
+    initStackBars();
+    initStatCounters();
+    initProjectModal();
+    initCertModal();
     initTypingAnimation();
+    initActiveNavSpy();
 });
 
 /* ═══════════════════════════════════════
-   MOBILE MENU — Sidebar Toggle
+   TOP NAV — solid on scroll
    ═══════════════════════════════════════ */
-function initMobileMenu() {
-    const toggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    if (!toggle || !sidebar) return;
-
-    function openMenu() {
-        toggle.classList.add('active');
-        sidebar.classList.add('open');
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeMenu() {
-        toggle.classList.remove('active');
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    toggle.addEventListener('click', () => {
-        if (sidebar.classList.contains('open')) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
-    });
-
-    overlay.addEventListener('click', closeMenu);
-
-    const closeBtn = document.getElementById('sidebarClose');
-    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeMenu();
-    });
+function initTopNav() {
+    const nav = document.getElementById('topnav');
+    if (!nav) return;
+    const onScroll = () => {
+        nav.classList.toggle('scrolled', window.scrollY > 30);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
 }
 
 /* ═══════════════════════════════════════
-   NAVIGATION TABS — Scroll Spy
+   BURGER — mobile menu
    ═══════════════════════════════════════ */
-function initNavTabs() {
-    const tabs = document.querySelectorAll('.nav-tab');
-    const sections = document.querySelectorAll('.content-section');
-    if (!tabs.length || !sections.length) return;
+function initBurger() {
+    const burger = document.getElementById('topnavBurger');
+    const links = document.getElementById('topnavLinks');
+    if (!burger || !links) return;
 
-    function showSection(targetId) {
-        sections.forEach(section => {
-            section.style.display = section.id === targetId ? '' : 'none';
-        });
-        tabs.forEach(tab => {
-            tab.classList.toggle('active', tab.getAttribute('data-target') === targetId);
-        });
-    }
-
-    // Click handler
-    tabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection(tab.getAttribute('data-target'));
-        });
+    burger.addEventListener('click', () => {
+        burger.classList.toggle('active');
+        links.classList.toggle('open');
     });
 
-    // Show first section by default
-    showSection('sobre');
+    links.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+            burger.classList.remove('active');
+            links.classList.remove('open');
+        });
+    });
 }
 
 /* ═══════════════════════════════════════
@@ -96,108 +60,70 @@ function initScrollAnimations() {
         });
     }, {
         root: null,
-        rootMargin: '0px 0px -60px 0px',
+        rootMargin: '0px 0px -80px 0px',
         threshold: 0.1,
     });
 
-    document.querySelectorAll('[data-aos]').forEach((el) => {
-        observer.observe(el);
-    });
+    document.querySelectorAll('[data-aos]').forEach((el) => observer.observe(el));
 }
 
 /* ═══════════════════════════════════════
-   SIDEBAR SKILLS — Animated Fill on Load
+   STACK BARS — animate on scroll
    ═══════════════════════════════════════ */
-function initSidebarSkills() {
-    const bars = document.querySelectorAll('.sidebar-skill-fill');
+function initStackBars() {
+    const bars = document.querySelectorAll('.stack-fill');
     if (!bars.length) return;
 
-    // Animate after a short delay for visual impact
-    setTimeout(() => {
-        bars.forEach((bar, index) => {
-            const width = bar.getAttribute('data-width');
-            setTimeout(() => {
-                bar.style.width = width + '%';
-            }, index * 120);
-        });
-    }, 500);
-}
-
-/* ═══════════════════════════════════════
-   IA SKILLS — Animated Fill on Scroll
-   ═══════════════════════════════════════ */
-function initIASkills() {
-    const section = document.getElementById('ia');
-    if (!section) return;
-
-    let animated = false;
-
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting && !animated) {
-                animated = true;
-                const bars = section.querySelectorAll('.ia-bar-fill');
-                bars.forEach((bar, index) => {
-                    const width = bar.getAttribute('data-width');
-                    setTimeout(() => {
-                        bar.style.width = width + '%';
-                    }, index * 150);
-                });
-            }
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const bar = entry.target;
+            const width = bar.getAttribute('data-width');
+            setTimeout(() => { bar.style.width = width + '%'; }, 100);
+            observer.unobserve(bar);
         });
     }, { threshold: 0.3 });
 
-    observer.observe(section);
+    bars.forEach(bar => observer.observe(bar));
 }
 
 /* ═══════════════════════════════════════
-   HERO STATS — Animated Counters
+   STAT COUNTERS — animated numbers
    ═══════════════════════════════════════ */
-function initHeroStats() {
-    const stats = document.querySelectorAll('.stat-number[data-target]');
+function initStatCounters() {
+    const stats = document.querySelectorAll('.stat-num[data-target]');
     if (!stats.length) return;
 
-    let animated = false;
-
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting && !animated) {
-                animated = true;
-                stats.forEach((stat) => animateCounter(stat));
-            }
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            animateCounter(entry.target);
+            observer.unobserve(entry.target);
         });
     }, { threshold: 0.3 });
 
-    stats.forEach((stat) => observer.observe(stat));
+    stats.forEach(el => observer.observe(el));
 }
 
 function animateCounter(el) {
-    const target = parseInt(el.getAttribute('data-target'));
+    const target = parseInt(el.getAttribute('data-target'), 10);
     const duration = 1800;
     const start = performance.now();
 
-    function update(currentTime) {
-        const elapsed = currentTime - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.floor(eased * target);
-
-        el.textContent = current;
-
-        if (progress < 1) {
-            requestAnimationFrame(update);
-        } else {
-            el.textContent = target;
-        }
+    function update(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.floor(eased * target);
+        if (p < 1) requestAnimationFrame(update);
+        else el.textContent = target;
     }
-
     requestAnimationFrame(update);
 }
 
 /* ═══════════════════════════════════════
    PROJECT CARDS — Modal
    ═══════════════════════════════════════ */
-function initProjectCards() {
+function initProjectModal() {
     const cards = document.querySelectorAll('.project-card');
     const modal = document.getElementById('projectModal');
     if (!cards.length || !modal) return;
@@ -209,16 +135,20 @@ function initProjectCards() {
     const closeBtn = modal.querySelector('.modal-close');
 
     cards.forEach(card => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+            // Don't open modal when clicking inner link
+            if (e.target.closest('.project-link')) return;
+
             const img = card.querySelector('.project-img img');
             const tags = card.querySelectorAll('.project-tags .tag');
             const title = card.querySelector('.project-title');
             const desc = card.querySelector('.project-desc');
+            if (!img || !title) return;
 
             modalImg.src = img.src;
             modalImg.alt = img.alt;
             modalTitle.textContent = title.textContent;
-            modalDesc.textContent = desc.textContent;
+            modalDesc.textContent = desc ? desc.textContent : '';
 
             modalTags.innerHTML = '';
             tags.forEach(tag => {
@@ -239,20 +169,60 @@ function initProjectCards() {
     }
 
     closeBtn.addEventListener('click', closeModal);
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-    });
-
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('active')) {
-            closeModal();
-        }
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
     });
 }
 
 /* ═══════════════════════════════════════
-   TYPING ANIMATION — Hero Subtitle
+   CERT MODAL — Certificate preview
+   ═══════════════════════════════════════ */
+function initCertModal() {
+    const buttons = document.querySelectorAll('.btn-cert');
+    const modal = document.getElementById('certModal');
+    if (!buttons.length || !modal) return;
+
+    const imgWrap = modal.querySelector('.cert-modal-img');
+    const img = document.getElementById('certImg');
+    const title = document.getElementById('certTitle');
+    const closeBtn = modal.querySelector('.modal-close');
+
+    function open(src, label) {
+        title.textContent = label || '';
+        imgWrap.classList.remove('empty');
+        img.onload = function() { imgWrap.classList.remove('empty'); };
+        img.onerror = function() { imgWrap.classList.add('empty'); };
+        img.src = src || '';
+        img.alt = label || '';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        img.src = '';
+        imgWrap.classList.remove('empty');
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            open(btn.dataset.cert, btn.dataset.title);
+        });
+    });
+
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) close();
+    });
+}
+
+/* ═══════════════════════════════════════
+   TYPING ANIMATION — Hero role
    ═══════════════════════════════════════ */
 function initTypingAnimation() {
     const el = document.getElementById('typingText');
@@ -260,38 +230,37 @@ function initTypingAnimation() {
 
     const phrases = [
         'BI Analyst',
-        'Business Automation'
+        'Business Automation',
+        'Python Developer',
+        'Data Enthusiast'
     ];
 
     const typeSpeed = 65;
-    const eraseSpeed = 35;
-    const pauseAfterType = 2200;
+    const eraseSpeed = 30;
+    const pauseAfterType = 2000;
     const pauseAfterErase = 400;
 
     let phraseIndex = 0;
     let charIndex = 0;
     let isErasing = false;
 
-    // Start after a brief delay
-    setTimeout(typeLoop, 800);
+    setTimeout(typeLoop, 700);
 
     function typeLoop() {
-        const currentPhrase = phrases[phraseIndex];
+        const current = phrases[phraseIndex];
 
         if (!isErasing) {
-            el.textContent = currentPhrase.substring(0, charIndex + 1);
+            el.textContent = current.substring(0, charIndex + 1);
             charIndex++;
-
-            if (charIndex < currentPhrase.length) {
+            if (charIndex < current.length) {
                 setTimeout(typeLoop, typeSpeed);
             } else {
                 isErasing = true;
                 setTimeout(typeLoop, pauseAfterType);
             }
         } else {
-            el.textContent = currentPhrase.substring(0, charIndex);
+            el.textContent = current.substring(0, charIndex);
             charIndex--;
-
             if (charIndex >= 0) {
                 setTimeout(typeLoop, eraseSpeed);
             } else {
@@ -302,4 +271,26 @@ function initTypingAnimation() {
             }
         }
     }
+}
+
+/* ═══════════════════════════════════════
+   ACTIVE NAV SPY — highlight current section
+   ═══════════════════════════════════════ */
+function initActiveNavSpy() {
+    const sections = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.topnav-link');
+    if (!sections.length || !links.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const id = entry.target.id;
+            links.forEach(link => {
+                const target = link.getAttribute('href').replace('#', '');
+                link.classList.toggle('active', target === id);
+            });
+        });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
 }
