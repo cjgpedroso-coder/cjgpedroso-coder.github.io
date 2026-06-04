@@ -73,6 +73,8 @@
     const mouse = { x: 0, y: 0 };           // current parallax offset
     const mtgt  = { x: 0, y: 0 };           // target parallax offset
     let firstScrolled = false;
+    let stillFrames = 0;                    // frames the camera has been settled
+    let worldLayered = true;                // is the world currently a GPU layer (will-change)?
 
     // ── Helpers ───────────────────────────────────────────────
     const lerp  = (a, b, t) => a + (b - a) * t;
@@ -182,9 +184,33 @@
         mouse.x = lerp(mouse.x, mtgt.x, MOUSE_LERP);
         mouse.y = lerp(mouse.y, mtgt.y, MOUSE_LERP);
 
+        // Is the camera still moving?
+        const moving =
+            Math.abs(tgt.cx - cam.cx) > 0.3 ||
+            Math.abs(tgt.cy - cam.cy) > 0.3 ||
+            Math.abs(tgt.s  - cam.s)  > 0.0004 ||
+            Math.abs(mtgt.x - mouse.x) > 0.003 ||
+            Math.abs(mtgt.y - mouse.y) > 0.003;
+
+        // When settled, snap exactly to target so the transform stops changing
+        if (!moving) {
+            cam.cx = tgt.cx; cam.cy = tgt.cy; cam.s = tgt.s;
+            mouse.x = mtgt.x; mouse.y = mtgt.y;
+        }
+
         const tx = vw / 2 - cam.cx * cam.s + mouse.x * AMP_WORLD;
         const ty = vh / 2 - cam.cy * cam.s + mouse.y * AMP_WORLD;
         world.style.transform = `translate(${tx}px, ${ty}px) scale(${cam.s})`;
+
+        // Crisp text: keep the GPU layer (will-change) only WHILE moving — smooth.
+        // Once settled, drop it so the browser repaints the board at real resolution — sharp.
+        if (moving) {
+            stillFrames = 0;
+            if (!worldLayered) { world.style.willChange = 'transform'; worldLayered = true; }
+        } else if (worldLayered && ++stillFrames > 6) {
+            world.style.willChange = 'auto';
+            worldLayered = false;
+        }
 
         // layered parallax
         bgLayer.style.transform = `translate(${mouse.x * AMP_BG}px, ${mouse.y * AMP_BG}px) scale(1.1)`;

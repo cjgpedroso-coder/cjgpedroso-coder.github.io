@@ -520,16 +520,16 @@ img.zoom { cursor: zoom-in; }
 /* fullscreen lightbox for diplomas & certificates */
 .lightbox {
     position: fixed; inset: 0; z-index: 2000;
-    background: rgba(10,7,3,0.93);
+    background: rgba(10,7,3,0.94);
     display: none; align-items: center; justify-content: center;
-    padding: 40px; cursor: zoom-out;
+    padding: 18px; cursor: zoom-out;
 }
 .lightbox.open { display: flex; animation: lbFade 0.22s ease; }
 .lightbox img {
-    max-width: 92vw; max-height: 90vh;
-    border: 12px solid #fbfbf7;
-    box-shadow: 0 30px 90px rgba(0,0,0,0.7);
-    background: #fff;
+    /* fill the screen and upscale small certificate images (object-fit keeps aspect) */
+    width: 96vw; height: 94vh;
+    object-fit: contain;
+    filter: drop-shadow(0 24px 70px rgba(0,0,0,0.7));
 }
 .lightbox-x {
     position: fixed; top: 22px; right: 30px;
