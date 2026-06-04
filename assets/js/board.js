@@ -476,6 +476,14 @@
                 lb.classList.add('open');
             });
         });
+        // elements carrying a data-zoom path (e.g. mobile certificate tickets / diplomas)
+        document.querySelectorAll('[data-zoom]').forEach(el => {
+            el.addEventListener('click', e => {
+                e.stopPropagation();
+                lbImg.src = el.dataset.zoom;
+                lb.classList.add('open');
+            });
+        });
     }
 
     // ── Certificates: click a chip → show its image in the polaroid + highlight it ──
@@ -540,23 +548,35 @@
         setTimeout(drawStrings, 120);
     }
 
+    // Small screens get the "ransom note" résumé instead of the heavy board.
+    const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
+
     window.addEventListener('resize', () => {
+        if (isMobile()) return;
         layoutScroll();
         measure();
         drawStrings();
     });
 
-    window.addEventListener('load', () => {
-        init();
-        // hide loader after first frames
-        setTimeout(() => loader.classList.add('hidden'), 450);
-        setTimeout(() => { measure(); drawStrings(); }, 600);   // re-measure once images affect layout
-    });
-
-    // fallback if load already fired
-    if (document.readyState === 'complete') {
+    function boot() {
+        if (isMobile()) {
+            loader.classList.add('hidden');   // CSS shows the .ransom layout
+            initLightbox();                    // tap a photo to zoom (mobile)
+            return;
+        }
         init();
         loader.classList.add('hidden');
         setTimeout(() => { measure(); drawStrings(); }, 600);
+    }
+
+    if (document.readyState === 'complete') {
+        boot();
+    } else {
+        window.addEventListener('load', () => {
+            if (isMobile()) { loader.classList.add('hidden'); initLightbox(); return; }
+            init();
+            setTimeout(() => loader.classList.add('hidden'), 450);
+            setTimeout(() => { measure(); drawStrings(); }, 600);
+        });
     }
 })();

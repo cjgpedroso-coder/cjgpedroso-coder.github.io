@@ -9,10 +9,11 @@
         content="Portfólio investigativo de Caio Pedroso — BI Analyst, Business Automation e Python Developer. Um quadro de evidências interativo.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Special+Elite&family=Permanent+Marker&family=Caveat:wght@500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Special+Elite&family=Permanent+Marker&family=Caveat:wght@500;600;700&family=Anton&family=Oswald:wght@400;500;600;700&family=Bebas+Neue&family=Playfair+Display:wght@600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/board.css?v=31">
+    <link rel="stylesheet" href="assets/css/board.css?v=32">
+    <link rel="stylesheet" href="assets/css/ransom.css?v=3">
 </head>
 
 <body>
@@ -555,18 +556,234 @@
     </div>
     <div class="progress-rail"><i id="progressBar"></i></div>
 
-    <!-- mobile note -->
-    <div class="mobile-note" id="mobileNote">
-        <p style="font-size:22px; letter-spacing:2px;">🔍 ARQUIVO DO CASO</p>
-        <p style="opacity:.8; line-height:1.6;">Esta experiência investigativa é otimizada para tela grande.<br>
-        Para a melhor experiência, abra no desktop.</p>
-        <p><a href="#" onclick="document.getElementById('mobileNote').style.display='none';return false;">Explorar mesmo assim →</a></p>
+    <!-- ═══════════════ VERSÃO MOBILE · NOTA DE RESGATE ═══════════════ -->
+    <div class="ransom" id="ransom">
+        <div class="ransom-inner">
+
+            <!-- ── TOPO · PROCURA-SE ── -->
+            <div class="wanted-banner">
+                <span class="stamp-top">★ PROCURA-SE ★</span>
+            </div>
+
+            <div class="ransom-head center ransom-name">
+                <span class="rl v1">C</span><span class="rl v3">A</span><span class="rl v6">I</span><span class="rl v2">O</span>
+            </div>
+            <div class="ransom-head center ransom-name">
+                <span class="rl v4">P</span><span class="rl v5">E</span><span class="rl v2">D</span><span class="rl v3">R</span><span class="rl v7">O</span><span class="rl v1">S</span><span class="rl v6">O</span>
+            </div>
+
+            <div class="mug">
+                <img class="zoom" src="assets/img/hero-img-0150.png" alt="Caio Pedroso">
+                <span class="cap">o suspeito</span>
+            </div>
+
+            <p class="ransom-tagline">
+                &ldquo;Dados que orientam decisões,<br><em>automação que devolve seu tempo</em>.&rdquo;
+            </p>
+
+            <div class="clip cream rot-l" style="margin-top:22px;">
+                <span class="tape tc"></span>
+                <div class="kicker">Ficha do procurado</div>
+                <div class="entry">
+                    <div class="what">BI Analyst · Business Automation · Python Dev</div>
+                    <div class="where">Última localização: Louveira / SP · +15 anos em atividade</div>
+                </div>
+                <div class="chips">
+                    <span class="chip dark">Power BI</span><span class="chip">SQL</span>
+                    <span class="chip">Python</span><span class="chip red">IA</span><span class="chip">Next.js</span>
+                </div>
+            </div>
+
+            <!-- ── SOBRE (artigo de jornal) ── -->
+            <div class="clip news rot-r">
+                <span class="tape tl"></span><span class="tape tr"></span>
+                <div class="kicker">Depoimento</div>
+                <h2 class="headline big">Quem é ele?</h2>
+                <div class="news-body">
+                    <p>Profissional com mais de <b>15 anos de experiência</b> nas áreas fiscal, financeira e de
+                    tecnologia. Nasceu em 1994, mora em Louveira (SP) e construiu a carreira transformando dados
+                    em decisões mais inteligentes e eficientes.</p>
+                    <p>Hoje atua como <b>Supervisor de Operações</b> na Green Village Mobile Homes e como
+                    <b>Analista de Dados / Responsável Fiscal</b> na Romica Brasil — unindo análise de dados,
+                    automação de processos e apoio à tomada de decisão.</p>
+                    <p>Mais do que as ferramentas, o que guia seu trabalho é enxergar oportunidades de melhoria e
+                    transformar rotinas complexas em soluções simples e eficazes. Movido por desafios e pela
+                    pergunta constante: <em>"como isso pode ser feito de forma melhor?"</em></p>
+                </div>
+                <div class="byline">Excel · Power BI · SQL (MySQL/Oracle) · Python · automação com IA</div>
+            </div>
+
+            <!-- ── FORMAÇÃO ── -->
+            <div class="clip cream rot-l">
+                <span class="tape tc red"></span>
+                <div class="kicker">Registros</div>
+                <h2 class="headline mid">Formação acadêmica</h2>
+                <div class="hint">toque para ver o diploma</div>
+                <div class="entry doc" data-zoom="assets/certs/bacharelado-engenharia-civil.jpeg"><div class="when">2014 — 2018</div><div class="what">Bacharelado em Engenharia Civil</div><div class="where">Centro Universitário Padre Anchieta — Jundiaí</div></div>
+                <div class="entry"><div class="when">2011 — 2013</div><div class="what">Técnico em Publicidade e Propaganda</div><div class="where">Escola Professor Luís Rosa — Jundiaí</div></div>
+                <div class="entry doc" data-zoom="assets/certs/wiseup-english.jpeg"><div class="when">2016 — 2018</div><div class="what">Executive English Course</div><div class="where">Wise Up — Jundiaí</div></div>
+                <div class="entry doc" data-zoom="assets/certs/ec-english-toronto.jpeg"><div class="when">2018</div><div class="what">Executive English Course</div><div class="where">EC English Holdings — Toronto, Canadá</div></div>
+
+                <div class="byline">Idiomas</div>
+                <div class="bar-row"><div class="lbl"><span>Português</span><span>Nativo</span></div><div class="bar"><i style="width:100%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Inglês</span><span>Avançado</span></div><div class="bar"><i style="width:70%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Espanhol</span><span>Básico</span></div><div class="bar"><i style="width:30%"></i></div></div>
+            </div>
+
+            <!-- ── CERTIFICAÇÕES ── -->
+            <div class="clip news rot-r">
+                <span class="tape tl"></span><span class="tape tr"></span>
+                <div class="kicker">Provas documentais</div>
+                <h2 class="headline mid">27 certificações</h2>
+                <div class="hint">toque para ver o certificado</div>
+                <div class="tickets">
+                    <div class="ticket" data-zoom="assets/certs/asimov-pandas-sql.png">Analisando Dados com Pandas e SQL<b>Asimov Academy</b></div>
+                    <div class="ticket" data-zoom="assets/certs/asimov-python-starter.png">Python Starter<b>Asimov Academy</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-power-bi.png">Power BI Desktop<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-oracle-db.png">Oracle DB: projeções, joins e views<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-sql-oracle.png">SQL com Oracle Database<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-dml-sql.png">Comandos DML · MySQL<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-logica-js.png">Lógica de programação: Pong e JS<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-logica-lacos.png">Lógica: laços e listas<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-modelagem-bd.png">Modelagem relacional: SQL<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-algebra-relacional.png">Modelagem: Álgebra Relacional<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-modelagem-logica.png">Modelagem: lógica e física<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-entidades.png">Modelagem: entidades e atributos<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-normalizacao.png">Modelagem: normalização<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-excel-domine.png">Excel: editor de planilhas<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-procedures-mysql.png">Procedures SQL · MySQL<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-git-github.png">Git e GitHub<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-consultas-sql.png">Consultas SQL · MySQL<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-sql-mysql.png">SQL com MySQL<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-excel-vba.png">Excel: VBA<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-js-dom.png">JavaScript: DOM<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-js-web.png">JavaScript para Web<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-html-css.png">HTML e CSS: responsividade<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-html-mobile.png">HTML e CSS: mobile-first<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-html-pratica.png">HTML e CSS: praticando<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-html-flexbox.png">HTML e CSS: Flexbox<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-html-header-footer.png">HTML e CSS: cabeçalho e variáveis<b>Alura</b></div>
+                    <div class="ticket" data-zoom="assets/certs/alura-html-ambiente.png">HTML e CSS: ambientes<b>Alura</b></div>
+                </div>
+            </div>
+
+            <!-- ── EXPERIÊNCIA ── -->
+            <div class="clip cream rot-l">
+                <span class="tape tc"></span>
+                <div class="kicker">Histórico</div>
+                <h2 class="headline mid">Experiência profissional</h2>
+                <div class="entry"><div class="when">SET/2025 — atual</div><div class="what">Supervisor de Operações Brasil</div><div class="where">Green Village Mobile Homes — operações, equipes e automação</div></div>
+                <div class="entry"><div class="when">JAN/2021 — atual</div><div class="what">Analista de Dados / Responsável Fiscal</div><div class="where">Romica Brasil — análise de dados e gestão fiscal</div></div>
+                <div class="entry"><div class="when">2021 — 2025</div><div class="what">Analista de Dados</div><div class="where">Romica · Power BI, Python, SQL, Firebase</div></div>
+                <div class="entry"><div class="when">2014 — 2021</div><div class="what">Responsável Fiscal</div><div class="where">Romica · liderança de equipe de 5</div></div>
+                <div class="entry"><div class="when">2012 — 2014</div><div class="what">Escriturário Fiscal Pleno</div><div class="where">Romica · fechamento contábil</div></div>
+                <div class="entry"><div class="when">2011 — 2012</div><div class="what">Escriturário Fiscal Júnior</div><div class="where">Romica · notas fiscais e impostos</div></div>
+                <div class="entry"><div class="when">2010 — 2011</div><div class="what">Estagiário em Tecnologia</div><div class="where">Romica · suporte e infraestrutura</div></div>
+            </div>
+
+            <!-- ── STACK ── -->
+            <div class="clip yellow rot-r">
+                <span class="tape tl"></span><span class="tape tr"></span>
+                <div class="kicker">Arsenal técnico</div>
+                <h2 class="headline mid">Ferramentas &amp; skills</h2>
+                <div class="bar-row" style="margin-top:10px;"><div class="lbl"><span>Excel Avançado</span><span>100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>SQL · MySQL · Oracle</span><span>90%</span></div><div class="bar"><i style="width:90%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Python</span><span>85%</span></div><div class="bar"><i style="width:85%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Pandas</span><span>85%</span></div><div class="bar"><i style="width:85%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Power BI</span><span>60%</span></div><div class="bar"><i style="width:60%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Claude</span><span>100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>OpenAI</span><span>100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Google AI Studio</span><span>90%</span></div><div class="bar"><i style="width:90%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>DevOps</span><span>60%</span></div><div class="bar"><i style="width:60%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Rotinas Administrativas</span><span>100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Rotinas Fiscais</span><span>100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Rotinas de R.H.</span><span>70%</span></div><div class="bar"><i style="width:70%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Rotinas Financeiras</span><span>100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
+                <div class="bar-row"><div class="lbl"><span>Gestão de Equipe</span><span>90%</span></div><div class="bar"><i style="width:90%"></i></div></div>
+            </div>
+
+            <!-- ── PROJETOS ── -->
+            <div class="clip white" style="transform: rotate(-0.6deg);">
+                <span class="tape tc red"></span>
+                <div class="kicker">Cenas do crime</div>
+                <h2 class="headline mid">Projetos</h2>
+
+                <div class="hint">toque na foto para ampliar</div>
+
+                <div class="proj">
+                    <div class="shot"><img class="zoom" src="assets/img/greengo-app.png" alt="Gestão Financeira IA"><span class="cap">★ Gestão Financeira IA</span></div>
+                    <h4>Gestão Financeira Inteligente</h4>
+                    <p>Aplicação completa de gestão financeira pessoal: investimentos em renda variável e fixa, múltiplas contas, cartões, metas e relatórios. Agente de IA via WhatsApp para lançamentos, edição e relatórios. <span style="white-space:nowrap;">Next.js · PostgreSQL · IA · WhatsApp</span></p>
+                    <a class="link" href="https://app.ggreengo.com" target="_blank" rel="noopener">Acessar projeto</a>
+                </div>
+
+                <div class="proj">
+                    <div class="shot"><img class="zoom" src="assets/img/gfp.png" alt="Gestão Financeira Pessoal"><span class="cap">Planilha GFP</span></div>
+                    <h4>Gestão Financeira Pessoal</h4>
+                    <p>Planilha completa com lançamentos dinâmicos, macros, login com senha, banco de dados oculto, múltiplos cartões, investimentos, cálculo de aposentadoria e relatórios. <span style="white-space:nowrap;">Excel · VBA · Macros</span></p>
+                </div>
+
+                <div class="proj">
+                    <div class="shot"><img class="zoom" src="assets/img/planilha-empresa.png" alt="Gestão Empresarial" onerror="this.style.opacity=.4"><span class="cap">Gestão Empresarial</span></div>
+                    <h4>Gestão Empresarial</h4>
+                    <p>Planilha versátil para gestão empresarial de qualquer segmento, com cálculos, análises e relatórios complexos para apoiar o empresário no dia a dia. <span style="white-space:nowrap;">Excel · VBA · Análise</span></p>
+                </div>
+
+                <div class="proj">
+                    <div class="shot"><img class="zoom" src="assets/img/gestão-nextjs.png" alt="Gestão Empresarial Complexa" onerror="this.style.opacity=.4"><span class="cap">★ Gestão Complexa</span></div>
+                    <h4>Gestão Empresarial Complexa</h4>
+                    <p>App web completa: login multinível, ponto digital, Vendas com 3+ mil anúncios via API, Logística, RH com folha automática, Financeiro com fluxo de caixa, CEO, T.I. e Desenvolvedor. <span style="white-space:nowrap;">React · Tailwind · SQLite · API</span></p>
+                </div>
+
+                <div class="proj">
+                    <div class="shot"><img class="zoom" src="assets/img/automation-activity.png" alt="Automação de Tarefas"><span class="cap">Automação de Tarefas</span></div>
+                    <h4>Automação de Tarefas Empresariais</h4>
+                    <p>Aplicação interna para modernizar tarefas empresariais: formação de preço, controle de estoque e geração de rotas logísticas e romaneios diários. <span style="white-space:nowrap;">Next.js · Prisma · API</span></p>
+                </div>
+
+                <div class="proj">
+                    <div class="shot"><img class="zoom" src="assets/img/webscraper-project.png" alt="Web Scraping IA"><span class="cap">Web Scraping IA</span></div>
+                    <h4>Web Scraping Inteligente</h4>
+                    <p>Coleta automatizada de anúncios de diversos fornecedores; agente de IA padroniza, traduz, organiza e calcula preços finais, gravando direto em PostgreSQL. <span style="white-space:nowrap;">Python · Next.js · IA · PostgreSQL</span></p>
+                </div>
+
+                <div class="proj">
+                    <div class="shot"><img class="zoom" src="assets/img/greenvillage-site.png" alt="Green Village Mobile Homes" onerror="this.style.opacity=.4"><span class="cap">Green Village</span></div>
+                    <h4>Green Village Mobile Homes</h4>
+                    <p>Site institucional de empresa portuguesa de casas móveis. Liderança de equipe e coordenação de frontend/backend, com foco em conversão. <span style="white-space:nowrap;">Next.js · Frontend · Liderança</span></p>
+                    <a class="link" href="https://greenvillagemobilehomes.com" target="_blank" rel="noopener">Visitar site</a>
+                </div>
+
+                <div class="proj">
+                    <div class="shot"><img class="zoom" src="assets/img/gv-wix-site.png" alt="Manutenção Site Wix" onerror="this.style.opacity=.4"><span class="cap">Manutenção Wix</span></div>
+                    <h4>Manutenção de Website (Wix)</h4>
+                    <p>Administração, manutenção e atualização contínua de site institucional em Wix, com coordenação da equipe de T.I. e garantia de performance e integridade do conteúdo. <span style="white-space:nowrap;">Wix · Gestão · T.I.</span></p>
+                </div>
+            </div>
+
+            <!-- ── CONTATO ── -->
+            <div class="clip yellow rot-r">
+                <span class="tape tl"></span><span class="tape tr"></span>
+                <div class="ransom-head center sm" style="margin-bottom:8px;">
+                    <span class="rl v6">R</span><span class="rl v3">E</span><span class="rl v2">C</span><span class="rl v4">O</span><span class="rl v5">M</span><span class="rl v1">P</span><span class="rl v7">E</span><span class="rl v3">N</span><span class="rl v2">S</span><span class="rl v6">A</span>
+                </div>
+                <p style="text-align:center; font-family:'Playfair Display',serif; font-size:15px; margin-bottom:4px;">Um profissional que resolve o caso. Fale comigo:</p>
+                <div class="contacts">
+                    <a href="mailto:cjgpedroso@gmail.com"><i class="fas fa-envelope"></i><span>E-mail<small>cjgpedroso@gmail.com</small></span></a>
+                    <a href="https://wa.me/5511945487575" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i><span>WhatsApp<small>+55 11 94548-7575</small></span></a>
+                    <a href="https://linkedin.com/in/caiojgpedroso" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i><span>LinkedIn<small>/in/caiojgpedroso</small></span></a>
+                    <a href="https://github.com/cjgpedroso-coder" target="_blank" rel="noopener"><i class="fab fa-github"></i><span>GitHub<small>/cjgpedroso-coder</small></span></a>
+                </div>
+            </div>
+
+            <div class="ransom-foot">CASO #1994 · © 2026 CAIO PEDROSO</div>
+        </div>
     </div>
 
     <!-- scroll spacer (height set by JS) -->
     <div id="scrollSpacer"></div>
 
-    <script src="assets/js/board.js?v=31"></script>
+    <script src="assets/js/board.js?v=33"></script>
 </body>
 
 </html>
